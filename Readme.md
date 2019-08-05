@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Роман Трухтанов](https://up.htmlacademy.ru/ecmascript/9/user/197856).
-* Наставник: `Неизвестно`.
+* Наставник: [Магомед Кандаев](https://up.htmlacademy.ru/ecmascript/9/user/161600).
 
 ---
 
