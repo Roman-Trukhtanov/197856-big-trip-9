@@ -13,12 +13,12 @@ const tripInfoContainer = document.querySelector(`.trip-info`);
 const eventsContainer = document.querySelector(`.trip-events`);
 
 const initApp = () => {
-  renderComponent(controlsContainer, getTabs(), `afterbegin`);
-  renderComponent(tripInfoContainer, getTripRouteLayout(), `afterbegin`);
-  renderComponent(controlsContainer, getTripFiltersLayout(), `beforeend`);
-  renderComponent(eventsContainer, getTripSortLayout(), `beforeend`);
-  renderComponent(eventsContainer, getTripEditLayout(), `beforeend`);
-  renderComponent(eventsContainer, getTripDaysLayout(), `beforeend`);
+  renderComponent(controlsContainer, getTabs());
+  renderComponent(tripInfoContainer, getTripRouteLayout());
+  renderComponent(controlsContainer, getTripFiltersLayout());
+  renderComponent(eventsContainer, getTripSortLayout());
+  renderComponent(eventsContainer, getTripEditLayout());
+  renderComponent(eventsContainer, getTripDaysLayout());
 };
 
 initApp();

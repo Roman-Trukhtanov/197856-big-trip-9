@@ -1,3 +1,3 @@
-export const renderComponent = (container, layoutTemplate, place) => {
-  container.insertAdjacentHTML(place, layoutTemplate);
+export const renderComponent = (container, layoutTemplate) => {
+  container.insertAdjacentHTML(`beforeend`, layoutTemplate);
 };
