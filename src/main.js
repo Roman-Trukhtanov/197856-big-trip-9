@@ -1,6 +1,7 @@
 import {renderComponent} from "./utils";
 import {getTabs} from "./components/tabs";
 import {getTripRouteLayout} from "./components/trip-info";
+import {getTripCostLayout} from "./components/trip-cost";
 import {getTripFiltersLayout} from "./components/trip-filters";
 import {getTripSortLayout} from "./components/sorting";
 import {getTripEditLayout} from "./components/trip-edit";
@@ -15,6 +16,7 @@ const eventsContainer = document.querySelector(`.trip-events`);
 const initApp = () => {
   renderComponent(controlsContainer, getTabs());
   renderComponent(tripInfoContainer, getTripRouteLayout());
+  renderComponent(tripInfoContainer, getTripCostLayout());
   renderComponent(controlsContainer, getTripFiltersLayout());
   renderComponent(eventsContainer, getTripSortLayout());
   renderComponent(eventsContainer, getTripEditLayout());
