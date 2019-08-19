@@ -1,11 +1,8 @@
 import {getDayItem} from "./day";
+import {wayPointsData} from "../data";
 
 export const getTripDaysLayout = () => {
-  let daysItemsLayout = ``;
-
-  new Array(3).fill(``).forEach(() => {
-    daysItemsLayout += getDayItem();
-  });
+  const daysItemsLayout = getDayItem(wayPointsData);
 
   return `<ul class="trip-days">
     ${daysItemsLayout}
