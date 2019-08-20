@@ -1,8 +1,7 @@
 import {getDayItem} from "./day";
-import {wayPointsData} from "../data";
 
-export const getTripDaysLayout = () => {
-  const daysItemsLayout = getDayItem(wayPointsData);
+export const getTripDaysLayout = (data) => {
+  const daysItemsLayout = getDayItem(data);
 
   return `<ul class="trip-days">
     ${daysItemsLayout}

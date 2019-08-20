@@ -1,10 +1,9 @@
 import {reducer} from "../utils";
-import {wayPointsData} from "../data";
 
-const getTotalPrice = (wayPoints) => wayPoints.map((wayPoint) => wayPoint.totalPrice).reduce(reducer);
+const getTotalPrice = (data) => data.map((dataItem) => dataItem.totalPrice).reduce(reducer);
 
-export const getTripCostLayout = () => {
+export const getTripCostLayout = (data) => {
   return `<p class="trip-info__cost">
-    Total: &euro;&nbsp;<span class="trip-info__cost-value">${getTotalPrice(wayPointsData)}</span>
+    Total: &euro;&nbsp;<span class="trip-info__cost-value">${getTotalPrice(data)}</span>
   </p>`.trim();
 };

@@ -1,12 +1,21 @@
 import {getCapitalizedString, getVisibleTime} from "../utils";
-import {wayPointTypes} from "../config";
-import {additionalOffers} from "../config";
-import {cities} from "../config";
+import {wayPointTypes, additionalOffers, cities} from "../config";
 
 const getTimeString = (timestamp) => {
   const date = new Date(timestamp);
 
   return `${date.getDay()}/${date.getMonth()}/${date.getFullYear()} ${getVisibleTime(timestamp)}`;
+};
+
+const getEventTypeGroupItem = (groupName, type, allTypes) => {
+  return `${(Object.keys(allTypes).filter((item) => allTypes[item].group === groupName)).map((typeItem) => {
+    const title = allTypes[typeItem].title;
+
+    return `<div class="event__type-item">
+      <input id="event-type-${title}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}" ${type.title === title ? `checked` : ``}>
+  <label class="event__type-label  event__type-label--${allTypes[typeItem].title}" for="event-type-${allTypes[typeItem].title}-1">${getCapitalizedString(title)}</label>
+    </div>`;
+  }).join(``)}`;
 };
 
 export const getTripEditLayout = ({type, city, time, description, photos, wayPointPrice}) => {
@@ -26,29 +35,12 @@ export const getTripEditLayout = ({type, city, time, description, photos, wayPoi
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Transfer</legend>
-            
-            ${(Object.keys(wayPointTypes).filter((item) => wayPointTypes[item].group === `transfer`)).map((typeItem) => {
-    const title = wayPointTypes[typeItem].title;
-
-    return `<div class="event__type-item">
-      <input id="event-type-${title}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}" ${type.title === title ? `checked` : ``}>
-      <label class="event__type-label  event__type-label--${wayPointTypes[typeItem].title}" for="event-type-${wayPointTypes[typeItem].title}-1">${getCapitalizedString(title)}</label>
-    </div>`;
-  }).join(``)}
-
+            ${getEventTypeGroupItem(`transfer`, type, wayPointTypes)}
           </fieldset>
 
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Activity</legend>
-
-            ${(Object.keys(wayPointTypes).filter((item) => wayPointTypes[item].group === `activity`)).map((typeItem) => {
-    const title = wayPointTypes[typeItem].title;
-
-    return `<div class="event__type-item">
-      <input id="event-type-${title}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}" ${type.title === title ? `checked` : ``}>
-      <label class="event__type-label  event__type-label--${wayPointTypes[typeItem].title}" for="event-type-${wayPointTypes[typeItem].title}-1">${getCapitalizedString(title)}</label>
-    </div>`;
-  }).join(``)}
+            ${getEventTypeGroupItem(`activity`, type, wayPointTypes)}
           </fieldset>
         </div>
       </div>

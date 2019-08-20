@@ -5,7 +5,9 @@ import {getTripCostLayout} from "./components/trip-cost";
 import {getTripFiltersLayout} from "./components/trip-filters";
 import {getTripSortLayout} from "./components/sorting";
 import {getTripDaysLayout} from "./components/days";
-import {infoData} from "./data";
+import {infoData, menuData, filtersData, wayPointsData} from "./data";
+
+const copiedWayPointsData = [...wayPointsData];
 
 const controlsContainer = document.querySelector(`.trip-controls`);
 
@@ -14,12 +16,12 @@ const tripInfoContainer = document.querySelector(`.trip-info`);
 const eventsContainer = document.querySelector(`.trip-events`);
 
 const initApp = () => {
-  renderComponent(controlsContainer, getTabs());
+  renderComponent(controlsContainer, getTabs(menuData));
   renderComponent(tripInfoContainer, getTripRouteLayout(infoData));
-  renderComponent(tripInfoContainer, getTripCostLayout());
-  renderComponent(controlsContainer, getTripFiltersLayout());
+  renderComponent(tripInfoContainer, getTripCostLayout(wayPointsData));
+  renderComponent(controlsContainer, getTripFiltersLayout(filtersData));
   renderComponent(eventsContainer, getTripSortLayout());
-  renderComponent(eventsContainer, getTripDaysLayout());
+  renderComponent(eventsContainer, getTripDaysLayout(copiedWayPointsData));
 };
 
 initApp();
