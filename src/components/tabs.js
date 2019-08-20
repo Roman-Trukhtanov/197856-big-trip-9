@@ -1,6 +1,10 @@
-export const getTabs = () => {
+const getTabItemLayout = ({title, isActive}) => {
+  return `<a class="trip-tabs__btn ${isActive ? `trip-tabs__btn--active` : ``}" href="#">${title}</a>
+    `;
+};
+
+export const getTabs = (menuData) => {
   return `<nav class="trip-controls__trip-tabs  trip-tabs">
-    <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
-    <a class="trip-tabs__btn" href="#">Stats</a>
+    ${menuData.map((menuItem) => getTabItemLayout(menuItem)).join(``)}
   </nav>`;
 };

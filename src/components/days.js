@@ -1,11 +1,7 @@
 import {getDayItem} from "./day";
 
-export const getTripDaysLayout = () => {
-  let daysItemsLayout = ``;
-
-  new Array(3).fill(``).forEach(() => {
-    daysItemsLayout += getDayItem();
-  });
+export const getTripDaysLayout = (data) => {
+  const daysItemsLayout = getDayItem(data);
 
   return `<ul class="trip-days">
     ${daysItemsLayout}
