@@ -131,7 +131,6 @@ export const menuData = [
   },
 ];
 
-
 export const filtersData = [
   {
     title: `everything`,
