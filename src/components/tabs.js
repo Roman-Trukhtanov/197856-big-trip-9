@@ -1,10 +1,23 @@
-const getTabItemLayout = ({title, isActive}) => {
-  return `<a class="trip-tabs__btn ${isActive ? `trip-tabs__btn--active` : ``}" href="#">${title}</a>
-    `;
-};
+import {createElement} from "../utils";
 
-export const getTabs = (menuData) => {
-  return `<nav class="trip-controls__trip-tabs  trip-tabs">
-    ${menuData.map((menuItem) => getTabItemLayout(menuItem)).join(``)}
-  </nav>`;
-};
+export default class Tabs {
+  constructor() {
+    this._element = null;
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return `<nav class="trip-controls__trip-tabs  trip-tabs"></nav>`.trim();
+  }
+}

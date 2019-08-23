@@ -1,7 +1,9 @@
 import {createElement} from "../utils";
 
-export default class Days {
-  constructor() {
+export default class Tab {
+  constructor({title, isActive}) {
+    this._title = title;
+    this._isActive = isActive;
     this._element = null;
   }
 
@@ -18,6 +20,6 @@ export default class Days {
   }
 
   getTemplate() {
-    return `<ul class="trip-days"></ul>`;
+    return `<a class="trip-tabs__btn ${this._isActive ? `trip-tabs__btn--active` : ``}" href="#">${this._title}</a>`.trim();
   }
 }

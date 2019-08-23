@@ -1,6 +1,6 @@
 import {createElement} from "../utils";
 
-export default class Days {
+export default class EventsMsg {
   constructor() {
     this._element = null;
   }
@@ -18,6 +18,6 @@ export default class Days {
   }
 
   getTemplate() {
-    return `<ul class="trip-days"></ul>`;
+    return `<p class="trip-events__msg">Click New Event to create your first point</p>`.trim();
   }
 }

@@ -106,7 +106,7 @@ const getWayPointData = () => ({
   }
 });
 
-export const wayPointsData = new Array(getRandomInt(3, 5)).fill(``).map(() => getWayPointData());
+export const wayPointsData = new Array(getRandomInt(0, 5)).fill(``).map(() => getWayPointData());
 
 const getAllCities = (wayPoints) => wayPoints.map((wayPoint) => wayPoint.city);
 
@@ -117,7 +117,7 @@ const getTimes = (wayPoints) => ({
 
 export const infoData = {
   cities: getAllCities(wayPointsData),
-  times: getTimes(wayPointsData),
+  times: wayPointsData.length > 0 ? getTimes(wayPointsData) : null,
 };
 
 export const menuData = [
@@ -130,7 +130,6 @@ export const menuData = [
     isActive: false,
   },
 ];
-
 
 export const filtersData = [
   {

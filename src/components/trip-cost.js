@@ -1,9 +1,27 @@
 import {reducer} from "../utils";
+import {createElement} from "../utils";
 
-const getTotalPrice = (data) => data.map((dataItem) => dataItem.totalPrice).reduce(reducer);
+export default class TripCost {
+  constructor(data) {
+    this._data = data;
+    this._element = null;
+  }
 
-export const getTripCostLayout = (data) => {
-  return `<p class="trip-info__cost">
-    Total: &euro;&nbsp;<span class="trip-info__cost-value">${getTotalPrice(data)}</span>
-  </p>`.trim();
-};
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return `<p class="trip-info__cost">
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${this._data.length > 0 ? this._data.map((dataItem) => dataItem.totalPrice).reduce(reducer) : 0}</span>
+    </p>`.trim();
+  }
+}
