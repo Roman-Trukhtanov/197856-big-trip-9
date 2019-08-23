@@ -143,6 +143,6 @@ export default class EventEdit {
           </section>
         </section>
       </form>
-    </li>`;
+    </li>`.trim();
   }
 }
