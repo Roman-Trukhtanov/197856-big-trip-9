@@ -11,6 +11,7 @@ import Event from "./components/event";
 import EventEdit from "./components/event-edit";
 import EventsMsg from "./components/events-msg";
 import {infoData, menuData, filtersData, wayPointsData} from "./data";
+import {wayPointTypes, additionalOffers, cities} from "./config";
 
 const copiedWayPointsData = [...wayPointsData];
 
@@ -64,11 +65,11 @@ const renderSortingForm = () => {
   render(eventsContainer, sortingElement, Position.BEFOREEND);
 };
 
-const renderEvents = (data, container) => {
+const renderEvents = (data, container, pointTypes, offers, citiesNames) => {
   const event = new Event(data);
   const eventElement = event.getElement();
 
-  const eventEdit = new EventEdit(data);
+  const eventEdit = new EventEdit(data, pointTypes, offers, citiesNames);
   const eventEditElement = eventEdit.getElement();
 
   const onEscKeyDown = (evt) => {
@@ -105,7 +106,7 @@ const renderEvents = (data, container) => {
   render(container, eventElement, Position.BEFOREEND);
 };
 
-const renderTripDays = (data) => {
+const renderTripDays = (data, pointTypes, offers, citiesNames) => {
   const days = new Days();
   const daysElement = days.getElement();
 
@@ -115,7 +116,7 @@ const renderTripDays = (data) => {
   const eventsListContainer = dayElement.querySelector(`.trip-events__list`);
 
   for (const dataItem of data) {
-    renderEvents(dataItem, eventsListContainer);
+    renderEvents(dataItem, eventsListContainer, pointTypes, offers, citiesNames);
   }
 
   render(daysElement, dayElement, Position.BEFOREEND);
@@ -140,7 +141,7 @@ const initApp = () => {
   if (copiedWayPointsData.length === 0) {
     renderEventsMessage();
   } else {
-    renderTripDays(copiedWayPointsData);
+    renderTripDays(copiedWayPointsData, wayPointTypes, additionalOffers, cities);
   }
 };
 

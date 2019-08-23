@@ -1,5 +1,4 @@
 import {createElement, getCapitalizedString, getVisibleTime} from "../utils";
-import {wayPointTypes, additionalOffers, cities} from "../config";
 
 const getTimeString = (timestamp) => {
   const date = new Date(timestamp);
@@ -19,13 +18,16 @@ const getEventTypeGroupItem = (groupName, type, allTypes) => {
 };
 
 export default class EventEdit {
-  constructor({type, city, time, description, photos, wayPointPrice}) {
+  constructor({type, city, time, description, photos, wayPointPrice}, wayPointTypes, additionalOffers, cities) {
     this._type = type;
     this._city = city;
     this._time = time;
     this._description = description;
     this._photos = photos;
     this._wayPointPrice = wayPointPrice;
+    this._wayPointTypes = wayPointTypes;
+    this._additionalOffers = additionalOffers;
+    this._cities = cities;
     this._element = null;
   }
 
@@ -59,12 +61,12 @@ export default class EventEdit {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
-                ${getEventTypeGroupItem(`transfer`, this._type, wayPointTypes)}
+                ${getEventTypeGroupItem(`transfer`, this._type, this._wayPointTypes)}
               </fieldset>
     
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Activity</legend>
-                ${getEventTypeGroupItem(`activity`, this._type, wayPointTypes)}
+                ${getEventTypeGroupItem(`activity`, this._type, this._wayPointTypes)}
               </fieldset>
             </div>
           </div>
@@ -73,7 +75,7 @@ export default class EventEdit {
             <label class="event__label  event__type-output" for="event-destination-1">${this._type.prefixTemplate}</label>
             <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._city}" list="destination-list-1">
             <datalist id="destination-list-1">
-              ${cities.map((cityItem) => `<option value="${cityItem}"></option>`).join(``)}
+              ${this._cities.map((cityItem) => `<option value="${cityItem}"></option>`).join(``)}
             </datalist>
           </div>
     
@@ -119,7 +121,7 @@ export default class EventEdit {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     
             <div class="event__available-offers">
-              ${additionalOffers.map((additionalOffer) => `<div class="event__offer-selector">
+              ${this._additionalOffers.map((additionalOffer) => `<div class="event__offer-selector">
                 <input class="event__offer-checkbox  visually-hidden" id="event-offer-${additionalOffer.title}-1" type="checkbox" name="event-offer-${additionalOffer.title}" ${additionalOffer.isSelected ? `checked` : ``}>
                 <label class="event__offer-label" for="event-offer-${additionalOffer.title}-1">
                   <span class="event__offer-title">${additionalOffer.title}</span>&plus; &euro;&nbsp;<span class="event__offer-price">${additionalOffer.price}</span>
