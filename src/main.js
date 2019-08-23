@@ -1,4 +1,4 @@
-import {render, Position} from "./utils";
+import {render, Position, isEscKey} from "./utils";
 import Tabs from "./components/tabs";
 import Tab from "./components/tab";
 import TripInfo from "./components/trip-info";
@@ -9,6 +9,7 @@ import Days from "./components/days";
 import Day from "./components/day";
 import Event from "./components/event";
 import EventEdit from "./components/event-edit";
+import EventsMsg from "./components/events-msg";
 import {infoData, menuData, filtersData, wayPointsData} from "./data";
 
 const copiedWayPointsData = [...wayPointsData];
@@ -34,10 +35,12 @@ const renderTabs = (controlsData) => {
 };
 
 const renderTripInfo = (data) => {
-  const tripInfo = new TripInfo(data);
-  const tripInfoElement = tripInfo.getElement();
+  if (data.times !== null) {
+    const tripInfo = new TripInfo(data);
+    const tripInfoElement = tripInfo.getElement();
 
-  render(tripInfoContainer, tripInfoElement, Position.BEFOREEND);
+    render(tripInfoContainer, tripInfoElement, Position.BEFOREEND);
+  }
 };
 
 const renderTripCost = (data) => {
@@ -68,11 +71,19 @@ const renderEvents = (data, container) => {
   const eventEdit = new EventEdit(data);
   const eventEditElement = eventEdit.getElement();
 
+  const onEscKeyDown = (evt) => {
+    if (isEscKey(evt)) {
+      container.replaceChild(eventElement, eventEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
+    }
+  };
+
   eventElement
     .querySelector(`.event__rollup-btn`)
     .addEventListener(`click`, (evt) => {
       evt.preventDefault();
       container.replaceChild(eventEditElement, eventElement);
+      document.addEventListener(`keydown`, onEscKeyDown);
     });
 
   eventEditElement
@@ -80,6 +91,7 @@ const renderEvents = (data, container) => {
     .addEventListener(`click`, (evt) => {
       evt.preventDefault();
       container.replaceChild(eventElement, eventEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
   eventEditElement
@@ -87,6 +99,7 @@ const renderEvents = (data, container) => {
     .addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       container.replaceChild(eventElement, eventEditElement);
+      document.removeEventListener(`keydown`, onEscKeyDown);
     });
 
   render(container, eventElement, Position.BEFOREEND);
@@ -110,13 +123,25 @@ const renderTripDays = (data) => {
   render(eventsContainer, daysElement, Position.BEFOREEND);
 };
 
+const renderEventsMessage = () => {
+  const eventsMsg = new EventsMsg();
+  const eventsMsgElement = eventsMsg.getElement();
+
+  render(eventsContainer, eventsMsgElement, Position.BEFOREEND);
+};
+
 const initApp = () => {
   renderTabs(menuData);
   renderTripInfo(infoData);
   renderTripCost(wayPointsData);
   renderTripFilters(filtersData);
   renderSortingForm();
-  renderTripDays(copiedWayPointsData);
+
+  if (copiedWayPointsData.length === 0) {
+    renderEventsMessage();
+  } else {
+    renderTripDays(copiedWayPointsData);
+  }
 };
 
 initApp();
