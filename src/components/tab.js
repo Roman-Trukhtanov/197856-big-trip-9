@@ -1,22 +1,10 @@
-import {createElement} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class Tab {
+export default class Tab extends AbstractComponent {
   constructor({title, isActive}) {
+    super();
     this._title = title;
     this._isActive = isActive;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

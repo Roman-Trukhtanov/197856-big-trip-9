@@ -1,17 +1,14 @@
-import {render, Position, isEscKey} from "./utils";
+import {render, Position} from "./utils";
 import Tabs from "./components/tabs";
 import Tab from "./components/tab";
 import TripInfo from "./components/trip-info";
 import TripCost from "./components/trip-cost";
 import TripFilters from "./components/trip-filters";
 import Sorting from "./components/sorting";
-import Days from "./components/days";
-import Day from "./components/day";
-import Event from "./components/event";
-import EventEdit from "./components/event-edit";
+import TripController from "./controllers/trip-controller";
 import EventsMsg from "./components/events-msg";
 import {infoData, menuData, filtersData, wayPointsData} from "./data";
-import {wayPointTypes, additionalOffers, cities} from "./config";
+import {wayPointTypes, additionalOffers, cities, monthsNames} from "./config";
 
 const copiedWayPointsData = [...wayPointsData];
 
@@ -35,9 +32,9 @@ const renderTabs = (controlsData) => {
   render(controlsContainer, tabsElement, Position.BEFOREEND);
 };
 
-const renderTripInfo = (data) => {
+const renderTripInfo = (data, months) => {
   if (data.times !== null) {
-    const tripInfo = new TripInfo(data);
+    const tripInfo = new TripInfo(data, months);
     const tripInfoElement = tripInfo.getElement();
 
     render(tripInfoContainer, tripInfoElement, Position.BEFOREEND);
@@ -65,65 +62,6 @@ const renderSortingForm = () => {
   render(eventsContainer, sortingElement, Position.BEFOREEND);
 };
 
-const renderEvents = (data, container, pointTypes, offers, citiesNames) => {
-  const event = new Event(data);
-  const eventElement = event.getElement();
-
-  const eventEdit = new EventEdit(data, pointTypes, offers, citiesNames);
-  const eventEditElement = eventEdit.getElement();
-
-  const onEscKeyDown = (evt) => {
-    if (isEscKey(evt)) {
-      container.replaceChild(eventElement, eventEditElement);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
-  eventElement
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      container.replaceChild(eventEditElement, eventElement);
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-
-  eventEditElement
-    .querySelector(`.event__rollup-btn`)
-    .addEventListener(`click`, (evt) => {
-      evt.preventDefault();
-      container.replaceChild(eventElement, eventEditElement);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-  eventEditElement
-    .querySelector(`.event--edit`)
-    .addEventListener(`submit`, (evt) => {
-      evt.preventDefault();
-      container.replaceChild(eventElement, eventEditElement);
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    });
-
-  render(container, eventElement, Position.BEFOREEND);
-};
-
-const renderTripDays = (data, pointTypes, offers, citiesNames) => {
-  const days = new Days();
-  const daysElement = days.getElement();
-
-  const day = new Day(data);
-  const dayElement = day.getElement();
-
-  const eventsListContainer = dayElement.querySelector(`.trip-events__list`);
-
-  for (const dataItem of data) {
-    renderEvents(dataItem, eventsListContainer, pointTypes, offers, citiesNames);
-  }
-
-  render(daysElement, dayElement, Position.BEFOREEND);
-
-  render(eventsContainer, daysElement, Position.BEFOREEND);
-};
-
 const renderEventsMessage = () => {
   const eventsMsg = new EventsMsg();
   const eventsMsgElement = eventsMsg.getElement();
@@ -133,7 +71,7 @@ const renderEventsMessage = () => {
 
 const initApp = () => {
   renderTabs(menuData);
-  renderTripInfo(infoData);
+  renderTripInfo(infoData, monthsNames);
   renderTripCost(wayPointsData);
   renderTripFilters(filtersData);
   renderSortingForm();
@@ -141,7 +79,9 @@ const initApp = () => {
   if (copiedWayPointsData.length === 0) {
     renderEventsMessage();
   } else {
-    renderTripDays(copiedWayPointsData, wayPointTypes, additionalOffers, cities);
+    const tripController = new TripController(eventsContainer, wayPointsData, wayPointTypes, additionalOffers, cities, monthsNames);
+
+    tripController.init();
   }
 };
 

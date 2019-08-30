@@ -1,25 +1,14 @@
-import {createElement, getVisibleTime} from "../utils";
+import {getVisibleTime} from "../utils";
+import AbstractComponent from "./abstract-component";
 
-export default class Event {
+export default class Event extends AbstractComponent {
   constructor({time, type, city, wayPointPrice, offers}) {
+    super();
     this._time = time;
     this._type = type;
     this._city = city;
     this._wayPointPrice = wayPointPrice;
     this._offers = offers;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {

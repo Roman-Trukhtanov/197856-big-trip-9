@@ -1,4 +1,5 @@
-import {createElement, getCapitalizedString, getVisibleTime} from "../utils";
+import {getCapitalizedString, getVisibleTime} from "../utils";
+import AbstractComponent from "./abstract-component";
 
 const getTimeString = (timestamp) => {
   const date = new Date(timestamp);
@@ -17,8 +18,9 @@ const getEventTypeGroupItem = (groupName, type, allTypes) => {
   }).join(``)}`;
 };
 
-export default class EventEdit {
+export default class EventEdit extends AbstractComponent {
   constructor({type, city, time, description, photos, wayPointPrice}, wayPointTypes, additionalOffers, cities) {
+    super();
     this._type = type;
     this._city = city;
     this._time = time;
@@ -28,19 +30,6 @@ export default class EventEdit {
     this._wayPointTypes = wayPointTypes;
     this._additionalOffers = additionalOffers;
     this._cities = cities;
-    this._element = null;
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 
   getTemplate() {
