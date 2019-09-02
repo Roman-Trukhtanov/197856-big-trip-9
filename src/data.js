@@ -8,9 +8,10 @@ import {
   MAX_SENTENCE_AMOUNT,
   description,
   MAX_PHOTOS_AMOUNT,
-  additionalOffers,
   cities,
   TIME_CONFIG,
+  getAdditionalOffers,
+  monthsNames,
 } from "./config";
 
 const {
@@ -28,14 +29,6 @@ const getRandomWayPointType = (types) => {
 };
 
 const getWayPointPrice = () => getRandomInt(MIN_POINT_PRICE, MAX_POINT_PRICE);
-
-const getOffers = (allOffers) => {
-  const copyAllOffers = [...allOffers];
-
-  const offersAmount = getRandomInt(0, 2);
-
-  return shuffleArray(copyAllOffers).splice(0, offersAmount);
-};
 
 const getWayPointPhotos = () => {
   const photosNumber = getRandomInt(0, MAX_PHOTOS_AMOUNT);
@@ -57,7 +50,7 @@ const getTime = () => {
   const randomDate = Date.now() + getRandomInt(0, DAYS_IN_WEEK - 1) * msInDay;
 
   const startTime = randomDate + getRandomInt(0, 1) * getRandomInt(0, HOURS_IN_DAY) * getRandomInt(0, MINUTES_IN_HOUR) * SECONDS_IN_MINUTE * MS_IN_SECOND;
-  const endTime = randomDate + getRandomInt(1, 3) * getRandomInt(0, HOURS_IN_DAY) * getRandomInt(0, MINUTES_IN_HOUR) * SECONDS_IN_MINUTE * MS_IN_SECOND;
+  const endTime = randomDate + getRandomInt(1, 3) * getRandomInt(2, HOURS_IN_DAY) * getRandomInt(1, MINUTES_IN_HOUR) * SECONDS_IN_MINUTE * MS_IN_SECOND;
 
   const diff = Math.abs(endTime - startTime);
 
@@ -93,13 +86,13 @@ const getWayPointData = () => ({
   time: getTime(),
   description: getWayPointDescription(description),
   photos: getWayPointPhotos(),
-  offers: getOffers(additionalOffers),
+  offers: getAdditionalOffers(),
 
   get totalPrice() {
     let offerPrices = 0;
 
     if (this.offers.length > 0) {
-      offerPrices += this.offers.map((offer) => offer.price).reduce(reducer);
+      offerPrices += this.offers.map((offer) => offer.isSelected ? offer.price : 0).reduce(reducer);
     }
 
     return this.wayPointPrice + offerPrices;
@@ -145,3 +138,26 @@ export const filtersData = [
     isChecked: false,
   },
 ];
+
+const getDays = (data) => {
+  const days = {};
+  let targetDayNumber = 1;
+
+  for (const dataItem of data) {
+    const dayKey = `${monthsNames[new Date(dataItem.time.startTime).getMonth()]}_${new Date(dataItem.time.startTime).getDate()}`;
+
+    if (days.hasOwnProperty(dayKey)) {
+      days[dayKey].events.push(dataItem);
+    } else {
+      days[dayKey] = {
+        events: [dataItem],
+        dayNumber: targetDayNumber++,
+      };
+    }
+  }
+
+  return days;
+};
+
+// Объект с данными всех дней
+export const daysData = getDays(wayPointsData);

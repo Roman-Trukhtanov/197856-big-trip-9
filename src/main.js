@@ -4,11 +4,10 @@ import Tab from "./components/tab";
 import TripInfo from "./components/trip-info";
 import TripCost from "./components/trip-cost";
 import TripFilters from "./components/trip-filters";
-import Sorting from "./components/sorting";
 import TripController from "./controllers/trip-controller";
 import EventsMsg from "./components/events-msg";
-import {infoData, menuData, filtersData, wayPointsData} from "./data";
-import {wayPointTypes, additionalOffers, cities, monthsNames} from "./config";
+import {infoData, menuData, filtersData, wayPointsData, daysData} from "./data";
+import {wayPointTypes, cities, monthsNames} from "./config";
 
 const copiedWayPointsData = [...wayPointsData];
 
@@ -55,13 +54,6 @@ const renderTripFilters = (data) => {
   render(controlsContainer, tripFiltersElements, Position.BEFOREEND);
 };
 
-const renderSortingForm = () => {
-  const sorting = new Sorting();
-  const sortingElement = sorting.getElement();
-
-  render(eventsContainer, sortingElement, Position.BEFOREEND);
-};
-
 const renderEventsMessage = () => {
   const eventsMsg = new EventsMsg();
   const eventsMsgElement = eventsMsg.getElement();
@@ -74,12 +66,11 @@ const initApp = () => {
   renderTripInfo(infoData, monthsNames);
   renderTripCost(wayPointsData);
   renderTripFilters(filtersData);
-  renderSortingForm();
 
   if (copiedWayPointsData.length === 0) {
     renderEventsMessage();
   } else {
-    const tripController = new TripController(eventsContainer, wayPointsData, wayPointTypes, additionalOffers, cities, monthsNames);
+    const tripController = new TripController(eventsContainer, wayPointsData, daysData, wayPointTypes, cities, monthsNames);
 
     tripController.init();
   }

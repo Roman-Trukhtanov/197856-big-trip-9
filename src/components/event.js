@@ -1,4 +1,5 @@
 import {getVisibleTime} from "../utils";
+import {MAX_VISIBLE_OFFERS_AMOUNT} from "../config";
 import AbstractComponent from "./abstract-component";
 
 export default class Event extends AbstractComponent {
@@ -9,6 +10,22 @@ export default class Event extends AbstractComponent {
     this._city = city;
     this._wayPointPrice = wayPointPrice;
     this._offers = offers;
+    this._visibleOffersAmount = 1;
+  }
+
+  _getOffersLayout() {
+    return this._offers.map((offer) => {
+      if (offer.isSelected === false || this._visibleOffersAmount > MAX_VISIBLE_OFFERS_AMOUNT) {
+        return ``;
+      }
+
+      this._visibleOffersAmount++;
+      return `<li class="event__offer">
+        <span class="event__offer-title">${offer.title}</span>
+        &plus;
+        &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
+      </li>`.trim();
+    }).join(``);
   }
 
   getTemplate() {
@@ -39,11 +56,7 @@ export default class Event extends AbstractComponent {
   
         <h4 class="visually-hidden">Offers:</h4>
         <ul class="event__selected-offers">
-          ${this._offers.map((offer) => `<li class="event__offer">
-            <span class="event__offer-title">${offer.title}</span>
-            &plus;
-            &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
-           </li>`.trim()).join(``)}
+          ${this._getOffersLayout()}
         </ul>
   
         <button class="event__rollup-btn" type="button">
