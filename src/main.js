@@ -17,17 +17,17 @@ const tripInfoContainer = document.querySelector(`.trip-info`);
 
 const eventsContainer = document.querySelector(`.trip-events`);
 
-const onMainDataChange = (newData) => {
-  copiedWayPointsData = newData;
-
-  changeTripCost();
-};
-
 const changeTripCost = () => {
   const tripCost = document.querySelector(`.trip-info__cost`);
   tripCost.remove();
 
   renderTripCost(wayPointsData);
+};
+
+const onMainDataChange = (newData) => {
+  copiedWayPointsData = newData;
+
+  changeTripCost();
 };
 
 const renderTabs = (controlsData) => {
