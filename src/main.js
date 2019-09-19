@@ -6,16 +6,29 @@ import TripCost from "./components/trip-cost";
 import TripFilters from "./components/trip-filters";
 import TripController from "./controllers/trip-controller";
 import EventsMsg from "./components/events-msg";
-import {infoData, menuData, filtersData, wayPointsData, daysData} from "./data";
+import {infoData, menuData, filtersData, wayPointsData} from "./data";
 import {wayPointTypes, cities, monthsNames} from "./config";
 
-const copiedWayPointsData = [...wayPointsData];
+let copiedWayPointsData = [...wayPointsData];
 
 const controlsContainer = document.querySelector(`.trip-controls`);
 
 const tripInfoContainer = document.querySelector(`.trip-info`);
 
 const eventsContainer = document.querySelector(`.trip-events`);
+
+const onMainDataChange = (newData) => {
+  copiedWayPointsData = newData;
+
+  changeTripCost();
+};
+
+const changeTripCost = () => {
+  const tripCost = document.querySelector(`.trip-info__cost`);
+  tripCost.remove();
+
+  renderTripCost(wayPointsData);
+};
 
 const renderTabs = (controlsData) => {
   const tabs = new Tabs();
@@ -70,7 +83,7 @@ const initApp = () => {
   if (copiedWayPointsData.length === 0) {
     renderEventsMessage();
   } else {
-    const tripController = new TripController(eventsContainer, wayPointsData, daysData, wayPointTypes, cities, monthsNames);
+    const tripController = new TripController(eventsContainer, wayPointsData, wayPointTypes, cities, monthsNames, onMainDataChange);
 
     tripController.init();
   }

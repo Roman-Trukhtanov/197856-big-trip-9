@@ -1,25 +1,31 @@
-export const renderComponent = (container, layoutTemplate) => {
-  container.insertAdjacentHTML(`beforeend`, layoutTemplate);
-};
+import {MAX_SENTENCE_AMOUNT, MIN_SENTENCE_AMOUNT, description} from "./config";
 
 export const getRandomInt = (min, max) => Math.floor(Math.random() * (max + 1 - min) + min);
 
 export const getRandomBool = () => Math.random() >= 0.5;
 
 export const shuffleArray = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
+  const copiedArray = [...array];
+
+  for (let i = copiedArray.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [copiedArray[i], copiedArray[j]] = [copiedArray[j], copiedArray[i]];
   }
 
-  return array;
+  return copiedArray;
 };
 
 export const reducer = (sum, current) => sum + current;
 
 export const getCapitalizedString = (string) => `${string.trim()[0].toUpperCase()}${string.slice(1)}`;
 
-export const getVisibleTime = (timestamp) => new Date(timestamp).toString().split(` `)[4].slice(0, 5);
+export const getWayPointDescription = (descriptions = description) => {
+  const sentencesAmount = getRandomInt(MIN_SENTENCE_AMOUNT, MAX_SENTENCE_AMOUNT);
+
+  const sentences = shuffleArray(descriptions.split(`. `).splice(0, sentencesAmount)).join(`. `);
+
+  return `${sentences}${sentences.length !== 0 ? `.` : ``}`;
+};
 
 export const Position = {
   AFTERBEGIN: `afterbegin`,

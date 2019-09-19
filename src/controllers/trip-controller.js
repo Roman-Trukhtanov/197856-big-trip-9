@@ -1,61 +1,44 @@
-import {isEscKey, Position, render} from "../utils";
+import {Position, render} from "../utils";
 import Days from "../components/days";
 import Day from "../components/day";
-import Event from "../components/event";
-import EventEdit from "../components/event-edit";
 import Sort from "../components/sort";
+import PointController from "./point-controller";
 
 export default class TripController {
-  constructor(container, wayPointsData, daysData, wayPointTypes, cities, monthsNames) {
+  constructor(container, wayPointsData, wayPointTypes, cities, monthsNames, onMainDataChange) {
     this._container = container;
     this._wayPointsData = wayPointsData;
-    this._daysData = daysData;
     this._wayPointsTypes = wayPointTypes;
     this._cities = cities;
     this._monthsNames = monthsNames;
     this._days = new Days();
     this._sort = new Sort();
+    this._subscriptions = [];
+    this.onChangeView = this.onChangeView.bind(this);
+    this.onDataChange = this.onDataChange.bind(this);
+    this._onMainDataChange = onMainDataChange;
+  }
+
+  onChangeView() {
+    this._subscriptions.forEach((setDefaultViewCall) => setDefaultViewCall());
+  }
+
+  onDataChange(newData, oldData) {
+    if (newData !== `undefined` && oldData !== `undefined`) {
+      this._wayPointsData[this._wayPointsData.findIndex((taskData) => taskData === oldData)] = newData;
+    }
+
+    this._onMainDataChange(this._wayPointsData);
+
+    this._subscriptions = [];
+    this._days.getElement().innerHTML = ``;
+    this._renderDays();
   }
 
   _renderEvents(data, container) {
-    const event = new Event(data);
-    const eventElement = event.getElement();
+    const pointController = new PointController(data, container, this._wayPointsTypes, this._cities, this.onDataChange, this.onChangeView);
 
-    const eventEdit = new EventEdit(data, this._wayPointsTypes, data.offers, this._cities);
-    const eventEditElement = eventEdit.getElement();
-
-    const onEscKeyDown = (evt) => {
-      if (isEscKey(evt)) {
-        container.replaceChild(eventElement, eventEditElement);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
-    eventElement
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, (evt) => {
-        evt.preventDefault();
-        container.replaceChild(eventEditElement, eventElement);
-        document.addEventListener(`keydown`, onEscKeyDown);
-      });
-
-    eventEditElement
-      .querySelector(`.event__rollup-btn`)
-      .addEventListener(`click`, (evt) => {
-        evt.preventDefault();
-        container.replaceChild(eventElement, eventEditElement);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-
-    eventEditElement
-      .querySelector(`.event--edit`)
-      .addEventListener(`submit`, (evt) => {
-        evt.preventDefault();
-        container.replaceChild(eventElement, eventEditElement);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-
-    render(container, eventElement, Position.BEFOREEND);
+    this._subscriptions.push(pointController.setDefaultView.bind(pointController));
   }
 
   init() {
@@ -63,13 +46,35 @@ export default class TripController {
     this._renderDays();
   }
 
+  _getDays(data) {
+    const days = {};
+    let targetDayNumber = 1;
+
+    for (const dataItem of data) {
+      const dayKey = `${this._monthsNames[new Date(dataItem.time.startTime).getMonth()]}_${new Date(dataItem.time.startTime).getDate()}`;
+
+      if (days.hasOwnProperty(dayKey)) {
+        days[dayKey].events.push(dataItem);
+      } else {
+        days[dayKey] = {
+          events: [dataItem],
+          dayNumber: targetDayNumber++,
+        };
+      }
+    }
+
+    return days;
+  }
+
   _renderDays() {
     const daysElement = this._days.getElement();
 
-    const daysKeys = Object.keys(this._daysData);
+    const daysData = this._getDays(this._wayPointsData);
+
+    const daysKeys = Object.keys(daysData);
 
     for (const key of daysKeys) {
-      const dayItemData = this._daysData[key];
+      const dayItemData = daysData[key];
       const dayEvents = dayItemData.events;
       const dayNumber = dayItemData.dayNumber;
 
