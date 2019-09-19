@@ -100,26 +100,31 @@ export const description = `Lorem ipsum dolor sit amet, consectetur adipiscing e
 export const getAdditionalOffers = () => [
   {
     title: `Add luggage`,
+    name: `luggage`,
     price: 30,
     isSelected: getRandomBool(),
   },
   {
     title: `Switch to comfort class`,
+    name: `comfort`,
     price: 100,
     isSelected: getRandomBool(),
   },
   {
     title: `Add meal`,
+    name: `meal`,
     price: 15,
     isSelected: getRandomBool(),
   },
   {
     title: `Choose seats`,
+    name: `seats`,
     price: 5,
     isSelected: getRandomBool(),
   },
   {
     title: `Travel by train`,
+    name: `travel`,
     price: 40,
     isSelected: getRandomBool(),
   }

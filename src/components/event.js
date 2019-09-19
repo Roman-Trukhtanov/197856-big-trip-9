@@ -1,5 +1,5 @@
-import {getVisibleTime} from "../utils";
 import {MAX_VISIBLE_OFFERS_AMOUNT} from "../config";
+import moment from "moment";
 import AbstractComponent from "./abstract-component";
 
 export default class Event extends AbstractComponent {
@@ -28,11 +28,24 @@ export default class Event extends AbstractComponent {
     }).join(``);
   }
 
-  getTemplate() {
-    const startTime = getVisibleTime(this._time.startTime);
-    const endTime = getVisibleTime(this._time.endTime);
+  _getVisibleTime(timeStamp) {
+    return moment(timeStamp).format(`HH:mm`);
+  }
 
-    const timeDuration = `${this._time.duration.days}D ${this._time.duration.hours}H ${this._time.duration.minutes}M`;
+  _getTimeDuration(startTimestamp, endTimestamp) {
+    const duration = moment.duration((moment(endTimestamp).diff(startTimestamp)));
+    const days = duration.days();
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+
+    return `${days}D ${hours}H ${minutes}M`;
+  }
+
+  getTemplate() {
+    const startTime = this._getVisibleTime(this._time.startTime);
+    const endTime = this._getVisibleTime(this._time.endTime);
+
+    const timeDuration = this._getTimeDuration(this._time.startTime, this._time.endTime);
 
     return `<li class="trip-events__item">
       <div class="event">
