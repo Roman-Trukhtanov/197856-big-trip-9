@@ -1,4 +1,4 @@
-import {getRandomInt, reducer, getWayPointDescription} from "./utils";
+import {getRandomInt, reducer, getWayPointDescription, sortDataByTime} from "./utils";
 import moment from "moment";
 
 import {
@@ -74,16 +74,21 @@ const getWayPointData = () => ({
   }
 });
 
-const sortedData = new Array(getRandomInt(0, 5))
-  .fill(``)
-  .map(() => getWayPointData())
-  .sort((left, right) => left.time.startTime - right.time.startTime);
+const getFullData = () => {
+  const generatedData = new Array(getRandomInt(0, 5))
+    .fill(``)
+    .map(() => getWayPointData());
 
-sortedData.forEach((itemData, index) => {
-  itemData.id = index;
-});
+  sortDataByTime(generatedData);
 
-export const wayPointsData = sortedData;
+  generatedData.forEach((itemData, index) => {
+    itemData.id = index;
+  });
+
+  return generatedData;
+};
+
+export const wayPointsData = getFullData();
 
 const getAllCities = (wayPoints) => wayPoints.map((wayPoint) => wayPoint.city);
 

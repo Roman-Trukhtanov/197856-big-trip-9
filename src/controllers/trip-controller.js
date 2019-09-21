@@ -1,4 +1,4 @@
-import {Position, render} from "../utils";
+import {Position, render, sortDataByTime} from "../utils";
 import Days from "../components/days";
 import Day from "../components/day";
 import Sort from "../components/sort";
@@ -26,6 +26,8 @@ export default class TripController {
   onDataChange(newData, oldData) {
     if (newData !== `undefined` && oldData !== `undefined`) {
       this._wayPointsData[this._wayPointsData.findIndex((taskData) => taskData === oldData)] = newData;
+
+      sortDataByTime(this._wayPointsData);
     }
 
     this._onMainDataChange(this._wayPointsData);
