@@ -92,10 +92,10 @@ const getTimes = (wayPoints) => ({
   endDate: wayPoints[wayPoints.length - 1].time.endTime,
 });
 
-export const infoData = {
-  cities: getAllCities(wayPointsData),
-  times: wayPointsData.length > 0 ? getTimes(wayPointsData) : null,
-};
+export const getInfoData = (data) => ({
+  cities: getAllCities(data),
+  times: data.length > 0 ? getTimes(data) : null,
+});
 
 export const menuData = [
   {

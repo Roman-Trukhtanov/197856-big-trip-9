@@ -1,4 +1,4 @@
-import {render, Position} from "./utils";
+import {render, Position, unrender} from "./utils";
 import Tabs from "./components/tabs";
 import Tab from "./components/tab";
 import TripInfo from "./components/trip-info";
@@ -6,7 +6,7 @@ import TripCost from "./components/trip-cost";
 import TripFilters from "./components/trip-filters";
 import TripController from "./controllers/trip-controller";
 import EventsMsg from "./components/events-msg";
-import {infoData, menuData, filtersData, wayPointsData} from "./data";
+import {getInfoData, menuData, filtersData, wayPointsData} from "./data";
 import {wayPointTypes, cities, monthsNames} from "./config";
 
 let copiedWayPointsData = [...wayPointsData];
@@ -17,17 +17,25 @@ const tripInfoContainer = document.querySelector(`.trip-info`);
 
 const eventsContainer = document.querySelector(`.trip-events`);
 
+const onMainDataChange = (newData) => {
+  copiedWayPointsData = newData;
+
+  changeTripInfo();
+  changeTripCost();
+};
+
 const changeTripCost = () => {
   const tripCost = document.querySelector(`.trip-info__cost`);
-  tripCost.remove();
+  unrender(tripCost);
 
   renderTripCost(wayPointsData);
 };
 
-const onMainDataChange = (newData) => {
-  copiedWayPointsData = newData;
+const changeTripInfo = () => {
+  const tripInfo = document.querySelector(`.trip-info__main`);
+  unrender(tripInfo);
 
-  changeTripCost();
+  renderTripInfo(getInfoData(wayPointsData), monthsNames);
 };
 
 const renderTabs = (controlsData) => {
@@ -76,7 +84,7 @@ const renderEventsMessage = () => {
 
 const initApp = () => {
   renderTabs(menuData);
-  renderTripInfo(infoData, monthsNames);
+  renderTripInfo(getInfoData(wayPointsData), monthsNames);
   renderTripCost(wayPointsData);
   renderTripFilters(filtersData);
 
