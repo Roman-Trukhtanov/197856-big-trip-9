@@ -14,9 +14,11 @@ export default class TripController {
     this._days = new Days();
     this._sort = new Sort();
     this._subscriptions = [];
+    this._flatPickrs = [];
     this.onChangeView = this.onChangeView.bind(this);
     this.onDataChange = this.onDataChange.bind(this);
     this._onMainDataChange = onMainDataChange;
+    this._sortType = `sort-event`;
   }
 
   onChangeView() {
@@ -24,7 +26,7 @@ export default class TripController {
   }
 
   onDataChange(newData, oldData) {
-    if (newData !== `undefined` && oldData !== `undefined`) {
+    if (newData !== null && oldData !== null) {
       this._wayPointsData[this._wayPointsData.findIndex((taskData) => taskData === oldData)] = newData;
 
       sortDataByTime(this._wayPointsData);
@@ -34,13 +36,23 @@ export default class TripController {
 
     this._subscriptions = [];
     this._days.getElement().innerHTML = ``;
-    this._renderDays();
+
+    this._sortEvents();
+  }
+
+  hide() {
+    this._container.classList.add(`visually-hidden`);
+  }
+
+  show() {
+    this._container.classList.remove(`visually-hidden`);
   }
 
   _renderEvents(data, container) {
     const pointController = new PointController(data, container, this._wayPointsTypes, this._cities, this.onDataChange, this.onChangeView);
 
     this._subscriptions.push(pointController.setDefaultView.bind(pointController));
+    this._flatPickrs.push(pointController.removeFlatPickr.bind(pointController));
   }
 
   init() {
@@ -119,16 +131,11 @@ export default class TripController {
     render(this._container, sortingElement, Position.BEFOREEND);
   }
 
-  _onSortItemClick(evt) {
-    if (!evt.target.hasAttribute(`data-sort-type`)) {
-      return;
-    }
+  _sortEvents() {
+    this._flatPickrs.forEach((removeFlatPickrs) => removeFlatPickrs());
+    this._flatPickrs = [];
 
-    this._days.getElement().innerHTML = ``;
-
-    const sortType = evt.target.dataset.sortType;
-
-    switch (sortType) {
+    switch (this._sortType) {
       case `sort-event`:
         this._renderDays();
         break;
@@ -146,5 +153,17 @@ export default class TripController {
         this._renderAllDaysList(sortedByPriceEventsData);
         break;
     }
+  }
+
+  _onSortItemClick(evt) {
+    if (!evt.target.hasAttribute(`data-sort-type`)) {
+      return;
+    }
+
+    this._days.getElement().innerHTML = ``;
+
+    this._sortType = evt.target.dataset.sortType;
+
+    this._sortEvents();
   }
 }

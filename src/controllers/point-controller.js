@@ -18,6 +18,7 @@ export default class PointController {
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._flatPickrs = [];
+    this._onEscKeyDown = this._onEscKeyDown.bind(this);
     this.init();
   }
 
@@ -35,9 +36,17 @@ export default class PointController {
     }));
   }
 
-  _removeFlatPickr() {
+  removeFlatPickr() {
     if (this._flatPickrs.length !== 0) {
       this._flatPickrs.forEach((flatPickr) => flatPickr.destroy());
+    }
+  }
+
+  _onEscKeyDown(evt) {
+    if (isEscKey(evt)) {
+      this.removeFlatPickr();
+      this._container.replaceChild(this._event.getElement(), this._eventEdit.getElement());
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
   }
 
@@ -46,13 +55,6 @@ export default class PointController {
 
     const eventEditElement = this._eventEdit.getElement();
 
-    const onEscKeyDown = (evt) => {
-      if (isEscKey(evt)) {
-        this._container.replaceChild(eventElement, eventEditElement);
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      }
-    };
-
     eventElement
       .querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, (evt) => {
@@ -60,23 +62,23 @@ export default class PointController {
 
         this._onChangeView();
 
-        this._removeFlatPickr();
+        this.removeFlatPickr();
 
         this._initFlatPickr(eventEditElement.querySelector(`input[name="event-start-time"]`), this._eventData.time.startTime);
 
         this._initFlatPickr(eventEditElement.querySelector(`input[name="event-end-time"]`), this._eventData.time.endTime);
 
         this._container.replaceChild(eventEditElement, eventElement);
-        document.addEventListener(`keydown`, onEscKeyDown);
+        document.addEventListener(`keydown`, this._onEscKeyDown);
       });
 
     eventEditElement
       .querySelector(`.event__rollup-btn`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
-        this._removeFlatPickr();
+        this.removeFlatPickr();
         this._container.replaceChild(eventElement, eventEditElement);
-        document.removeEventListener(`keydown`, onEscKeyDown);
+        document.removeEventListener(`keydown`, this._onEscKeyDown);
       });
 
     eventEditElement
@@ -85,9 +87,9 @@ export default class PointController {
         evt.preventDefault();
         this._container.replaceChild(eventElement, eventEditElement);
 
-        this._onDataChange(this._getNewData());
+        this._onDataChange(this._getNewData(), this._eventData);
 
-        document.removeEventListener(`keydown`, onEscKeyDown);
+        document.removeEventListener(`keydown`, this._onEscKeyDown);
       });
 
     render(this._container, eventElement, Position.BEFOREEND);
@@ -136,7 +138,8 @@ export default class PointController {
 
   setDefaultView() {
     if (this._container.contains(this._eventEdit.getElement())) {
-      this._removeFlatPickr();
+      this.removeFlatPickr();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
       this._container.replaceChild(this._event.getElement(), this._eventEdit.getElement());
     }
   }

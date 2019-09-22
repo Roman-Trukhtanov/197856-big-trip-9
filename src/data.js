@@ -1,4 +1,11 @@
-import {getRandomInt, reducer, getWayPointDescription, sortDataByTime} from "./utils";
+import {
+  getRandomInt,
+  reducer,
+  getWayPointDescription,
+  sortDataByTime,
+  getRandomBool
+} from "./utils";
+
 import moment from "moment";
 
 import {
@@ -62,6 +69,7 @@ const getWayPointData = () => ({
   description: getWayPointDescription(description),
   photos: getWayPointPhotos(),
   offers: getAdditionalOffers(),
+  isFavorite: getRandomBool(),
 
   get totalPrice() {
     let offerPrices = 0;
@@ -102,7 +110,7 @@ export const getInfoData = (data) => ({
   times: data.length > 0 ? getTimes(data) : null,
 });
 
-export const menuData = [
+export const getMenuData = () => [
   {
     title: `Table`,
     isActive: true,
@@ -113,7 +121,7 @@ export const menuData = [
   },
 ];
 
-export const filtersData = [
+export const getFiltersData = () => [
   {
     title: `everything`,
     isChecked: true,

@@ -65,6 +65,8 @@ export const isEscKey = (evt) => {
   return evt.key === `Escape` || evt.key === `Esc`;
 };
 
+export const isLinkTag = (evt) => evt.target.tagName === `A`;
+
 export const sortDataByTime = (dataArr) => {
   dataArr.sort((left, right) => left.time.startTime - right.time.startTime);
 };

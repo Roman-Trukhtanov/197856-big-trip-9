@@ -6,19 +6,8 @@ const getTimeString = (timestamp) => {
   return moment(timestamp).format(`DD/MM/YYYY HH:mm`);
 };
 
-const getEventTypeGroupItem = (groupName, type, allTypes, id) => {
-  return `${(Object.keys(allTypes).filter((item) => allTypes[item].group === groupName)).map((typeItem) => {
-    const title = allTypes[typeItem].title;
-
-    return `<div class="event__type-item">
-      <input id="event-type-${title}-${id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}" ${type.title === title ? `checked` : ``}>
-  <label class="event__type-label  event__type-label--${allTypes[typeItem].title}" for="event-type-${allTypes[typeItem].title}-${id}">${getCapitalizedString(title)}</label>
-    </div>`;
-  }).join(``)}`;
-};
-
 export default class EventEdit extends AbstractComponent {
-  constructor({id, type, city, time, description, photos, wayPointPrice}, wayPointTypes, additionalOffers, cities) {
+  constructor({id, type, city, time, description, photos, wayPointPrice, isFavorite}, wayPointTypes, additionalOffers, cities) {
     super();
     this._type = type;
     this._city = city;
@@ -30,8 +19,21 @@ export default class EventEdit extends AbstractComponent {
     this._additionalOffers = additionalOffers;
     this._id = id;
     this._cities = cities;
+    this._isFavorite = isFavorite;
 
     this._addListenersToEventType();
+    this._addListenerToFavorite();
+  }
+
+  _getEventTypeGroupItem(groupName) {
+    return `${(Object.keys(this._wayPointTypes).filter((item) => this._wayPointTypes[item].group === groupName)).map((typeItem) => {
+      const title = this._wayPointTypes[typeItem].title;
+
+      return `<div class="event__type-item">
+        <input id="event-type-${title}-${this._id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}" ${this._type.title === title ? `checked` : ``}>
+        <label class="event__type-label  event__type-label--${this._wayPointTypes[typeItem].title}" for="event-type-${this._wayPointTypes[typeItem].title}-${this._id}">${getCapitalizedString(title)}</label>
+      </div>`;
+    }).join(``)}`;
   }
 
   getTemplate() {
@@ -52,12 +54,12 @@ export default class EventEdit extends AbstractComponent {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Transfer</legend>
-                ${getEventTypeGroupItem(`transfer`, this._type, this._wayPointTypes, this._id)}
+                ${this._getEventTypeGroupItem(`transfer`)}
               </fieldset>
     
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Activity</legend>
-                ${getEventTypeGroupItem(`activity`, this._type, this._wayPointTypes, this._id)}
+                ${this._getEventTypeGroupItem(`activity`, this._type, this._wayPointTypes, this._id)}
               </fieldset>
             </div>
           </div>
@@ -93,7 +95,7 @@ export default class EventEdit extends AbstractComponent {
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
     
-          <input id="event-favorite-${this._id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked>
+          <input id="event-favorite-${this._id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite ? `checked` : ``}>
           <label class="event__favorite-btn" for="event-favorite-${this._id}">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -174,5 +176,15 @@ export default class EventEdit extends AbstractComponent {
     const eventTypeInputs = this.getElement().querySelectorAll(`.event__type-input`);
 
     eventTypeInputs.forEach((eventTypeInput) => eventTypeInput.addEventListener(`change`, (evt) => this._onEventTypeInputChange(evt)));
+  }
+
+  _addListenerToFavorite() {
+    const favoriteItem = this.getElement().querySelector(`.event__favorite-checkbox`);
+
+    favoriteItem.addEventListener(`change`, (evt) => {
+      evt.preventDefault();
+
+      this._isFavorite = !this._isFavorite;
+    });
   }
 }
