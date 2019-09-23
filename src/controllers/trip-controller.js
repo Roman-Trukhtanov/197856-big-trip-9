@@ -1,11 +1,23 @@
-import {Position, render, sortDataByTime} from "../utils";
+import {Position, reducer, render, sortDataByTime} from "../utils";
 import Days from "../components/days";
 import Day from "../components/day";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
 
+export const Mode = {
+  ADDING: `adding`,
+  DEFAULT: `default`,
+};
+
 export default class TripController {
-  constructor(container, wayPointsData, wayPointTypes, cities, monthsNames, onMainDataChange) {
+  constructor(
+      container,
+      wayPointsData,
+      wayPointTypes,
+      cities,
+      monthsNames,
+      onMainDataChange
+  ) {
     this._container = container;
     this._wayPointsData = wayPointsData;
     this._wayPointsTypes = wayPointTypes;
@@ -13,24 +25,47 @@ export default class TripController {
     this._monthsNames = monthsNames;
     this._days = new Days();
     this._sort = new Sort();
+    this._addListenerToSortItems();
     this._subscriptions = [];
     this._flatPickrs = [];
     this.onChangeView = this.onChangeView.bind(this);
     this.onDataChange = this.onDataChange.bind(this);
     this._onMainDataChange = onMainDataChange;
     this._sortType = `sort-event`;
+    this._creatingTask = null;
+  }
+  init() {
+    this._renderSort();
+    this._renderDays();
   }
 
   onChangeView() {
+    // Если новый поинт был создан, но не сохранен -> удалить его
+    if (this._creatingTask) {
+      this._days.getElement().firstChild.remove();
+      this._creatingTask = null;
+    }
+
     this._subscriptions.forEach((setDefaultViewCall) => setDefaultViewCall());
   }
 
   onDataChange(newData, oldData) {
-    if (newData !== null && oldData !== null) {
-      this._wayPointsData[this._wayPointsData.findIndex((taskData) => taskData === oldData)] = newData;
+    const pointIndex = this._wayPointsData.findIndex((taskData) => taskData === oldData);
 
-      sortDataByTime(this._wayPointsData);
+    if (newData === null && oldData === null) {
+      this._creatingTask = null;
+    } else if (newData === null) {
+      this._wayPointsData = [...this._wayPointsData.slice(0, pointIndex), ...this._wayPointsData.slice(pointIndex + 1)];
+      this._creatingTask = null;
+    } else if (oldData === null) {
+      this._creatingTask = null;
+      this._wayPointsData = [newData, ...this._wayPointsData];
+    } else {
+      this._creatingTask = null;
+      this._wayPointsData[pointIndex] = newData;
     }
+
+    sortDataByTime(this._wayPointsData);
 
     this._onMainDataChange(this._wayPointsData);
 
@@ -48,16 +83,54 @@ export default class TripController {
     this._container.classList.remove(`visually-hidden`);
   }
 
-  _renderEvents(data, container) {
-    const pointController = new PointController(data, container, this._wayPointsTypes, this._cities, this.onDataChange, this.onChangeView);
+  createEvent() {
+    if (this._creatingTask) {
+      return;
+    }
+
+    const defaultEventData = {
+      dayNumber: ``,
+      events: [{
+        id: this._wayPointsData.length,
+        type: {
+          title: `taxi`,
+          srcIconName: `taxi.png`,
+          prefixTemplate: `Taxi to`,
+          group: `transfer`,
+        },
+        city: ``,
+        wayPointPrice: 0,
+        time: {
+          startTime: ``,
+          endTime: ``,
+        },
+        description: ``,
+        photos: [],
+        offers: [],
+        isFavorite: false,
+
+        get totalPrice() {
+          let offerPrices = 0;
+
+          if (this.offers.length > 0) {
+            offerPrices += this.offers.map((offer) => offer.isSelected ? offer.price : 0).reduce(reducer);
+          }
+
+          return this.wayPointPrice + offerPrices;
+        }
+      }]
+    };
+
+    this._creatingTask = true;
+
+    this._renderDay(defaultEventData.events, defaultEventData.dayNumber, this._days.getElement(), Mode.ADDING);
+  }
+
+  _renderEvent(data, container, mode) {
+    const pointController = new PointController(data, container, this._wayPointsTypes, this._cities, this.onDataChange, this.onChangeView, mode);
 
     this._subscriptions.push(pointController.setDefaultView.bind(pointController));
     this._flatPickrs.push(pointController.removeFlatPickr.bind(pointController));
-  }
-
-  init() {
-    this._renderSort();
-    this._renderDays();
   }
 
   _getDays(data) {
@@ -80,6 +153,25 @@ export default class TripController {
     return days;
   }
 
+  _renderDay(dayEvents, dayNumber, daysElement, mode) {
+    let renderPosition = Position.BEFOREEND;
+
+    if (mode === Mode.ADDING) {
+      renderPosition = Position.AFTERBEGIN;
+    }
+
+    const day = new Day(dayEvents, dayNumber);
+    const dayElement = day.getElement();
+
+    const eventsListContainer = dayElement.querySelector(`.trip-events__list`);
+
+    for (const dataItem of dayEvents) {
+      this._renderEvent(dataItem, eventsListContainer, mode);
+    }
+
+    render(daysElement, dayElement, renderPosition);
+  }
+
   _renderDays() {
     const daysElement = this._days.getElement();
 
@@ -92,16 +184,7 @@ export default class TripController {
       const dayEvents = dayItemData.events;
       const dayNumber = dayItemData.dayNumber;
 
-      const day = new Day(dayEvents, this._monthsNames, dayNumber);
-      const dayElement = day.getElement();
-
-      const eventsListContainer = dayElement.querySelector(`.trip-events__list`);
-
-      for (const dataItem of dayEvents) {
-        this._renderEvents(dataItem, eventsListContainer);
-      }
-
-      render(daysElement, dayElement, Position.BEFOREEND);
+      this._renderDay(dayEvents, dayNumber, daysElement, Mode.DEFAULT);
     }
 
     render(this._container, daysElement, Position.BEFOREEND);
@@ -117,7 +200,7 @@ export default class TripController {
     const eventsListContainer = dayElement.querySelector(`.trip-events__list`);
 
     for (const dataItem of data) {
-      this._renderEvents(dataItem, eventsListContainer);
+      this._renderEvent(dataItem, eventsListContainer, Mode.DEFAULT);
     }
 
     render(daysElement, dayElement, Position.BEFOREEND);
@@ -126,9 +209,12 @@ export default class TripController {
   _renderSort() {
     const sortingElement = this._sort.getElement();
 
-    sortingElement.addEventListener(`click`, (evt) => this._onSortItemClick(evt));
-
     render(this._container, sortingElement, Position.BEFOREEND);
+  }
+
+  _addListenerToSortItems() {
+    const sortingElement = this._sort.getElement();
+    sortingElement.addEventListener(`change`, (evt) => this._onSortItemClick(evt));
   }
 
   _sortEvents() {
@@ -156,7 +242,7 @@ export default class TripController {
   }
 
   _onSortItemClick(evt) {
-    if (!evt.target.hasAttribute(`data-sort-type`)) {
+    if (!evt.target.hasAttribute(`data-sort-type`) || this._wayPointsData.length === 0) {
       return;
     }
 

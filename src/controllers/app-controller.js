@@ -39,6 +39,7 @@ export default class App {
     this._eventsMsg = new EventsMsg();
     this._statistics = new Statistics();
     this._onMainDataChange = this._onMainDataChange.bind(this);
+    this._isInitedTripController = false;
   }
 
   init() {
@@ -50,10 +51,16 @@ export default class App {
     this._renderStatistics();
 
     this._addListenerToTabs();
+    this._addListenerToNewEvtBtn();
   }
 
   _onMainDataChange(newData) {
     this._data = newData;
+
+    if (this._data.length === 0) {
+      this._mainContainer.innerHTML = ``;
+      this._renderEventsMessage();
+    }
 
     this._changeTripInfo();
     this._changeTripCost();
@@ -92,7 +99,7 @@ export default class App {
 
   _renderTripInfo(infoData) {
     if (infoData.times !== null) {
-      this._tripInfo = new TripInfo(infoData, this._monthsNames);
+      this._tripInfo = new TripInfo(infoData);
       const tripInfoElement = this._tripInfo.getElement();
 
       render(this._infoContainer, tripInfoElement, Position.BEFOREEND);
@@ -132,6 +139,7 @@ export default class App {
       this._renderEventsMessage();
     } else {
       this._tripController.init();
+      this._isInitedTripController = true;
     }
   }
 
@@ -176,6 +184,30 @@ export default class App {
           this._showStatistics();
           break;
       }
+    });
+  }
+
+  _addListenerToNewEvtBtn() {
+    const newEvtBtn = document.querySelector(`.trip-main__event-add-btn`);
+
+    newEvtBtn.addEventListener(`click`, (evt) => {
+      evt.preventDefault();
+
+      // При первом заходе в приложение и нет ни одного поинта
+      if (this._isInitedTripController === false) {
+        this._isInitedTripController = true;
+        this._mainContainer.innerHTML = ``;
+        this._tripController.init();
+      }
+
+      // Конда TripController был инициализирован, но пользователь удалил все поинты
+      if (this._data.length === 0 && this._isInitedTripController === true) {
+        this._mainContainer.innerHTML = ``;
+        this._tripController.init();
+      }
+
+      this._tripController.onChangeView();
+      this._tripController.createEvent();
     });
   }
 }

@@ -1,13 +1,14 @@
 import {getCapitalizedString, getRandomInt, getWayPointDescription, shuffleArray} from "../utils";
 import moment from "moment";
 import AbstractComponent from "./abstract-component";
+import {Mode} from "../controllers/trip-controller";
 
 const getTimeString = (timestamp) => {
   return moment(timestamp).format(`DD/MM/YYYY HH:mm`);
 };
 
 export default class EventEdit extends AbstractComponent {
-  constructor({id, type, city, time, description, photos, wayPointPrice, isFavorite}, wayPointTypes, additionalOffers, cities) {
+  constructor({id, type, city, time, description, photos, wayPointPrice, isFavorite}, wayPointTypes, additionalOffers, cities, mode) {
     super();
     this._type = type;
     this._city = city;
@@ -20,6 +21,7 @@ export default class EventEdit extends AbstractComponent {
     this._id = id;
     this._cities = cities;
     this._isFavorite = isFavorite;
+    this._mode = mode;
 
     this._addListenersToEventType();
     this._addListenerToFavorite();
@@ -94,18 +96,18 @@ export default class EventEdit extends AbstractComponent {
     
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
-    
-          <input id="event-favorite-${this._id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn" for="event-favorite-${this._id}">
-            <span class="visually-hidden">Add to favorite</span>
-            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-            </svg>
-          </label>
-    
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          
+          ${this._mode === Mode.DEFAULT ? `
+            <input id="event-favorite-${this._id}" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite ? `checked` : ``}>
+            <label class="event__favorite-btn" for="event-favorite-${this._id}">
+              <span class="visually-hidden">Add to favorite</span>
+              <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+                <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+              </svg>
+            </label>
+            <button class="event__rollup-btn" type="button">
+              <span class="visually-hidden">Open event</span>
+            </button>` : ``}
         </header>
     
         <section class="event__details">
@@ -181,10 +183,12 @@ export default class EventEdit extends AbstractComponent {
   _addListenerToFavorite() {
     const favoriteItem = this.getElement().querySelector(`.event__favorite-checkbox`);
 
-    favoriteItem.addEventListener(`change`, (evt) => {
-      evt.preventDefault();
+    if (favoriteItem) {
+      favoriteItem.addEventListener(`change`, (evt) => {
+        evt.preventDefault();
 
-      this._isFavorite = !this._isFavorite;
-    });
+        this._isFavorite = !this._isFavorite;
+      });
+    }
   }
 }
