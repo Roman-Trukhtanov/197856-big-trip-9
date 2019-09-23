@@ -34,9 +34,9 @@ export default class Event extends AbstractComponent {
 
   _getTimeDuration(startTimestamp, endTimestamp) {
     const duration = moment.duration((moment(endTimestamp).diff(startTimestamp)));
-    const days = duration.days();
-    const hours = duration.hours();
-    const minutes = duration.minutes();
+    const days = duration.days() < 10 ? `0${duration.days()}` : duration.days();
+    const hours = duration.hours() < 10 ? `0${duration.hours()}` : duration.hours();
+    const minutes = duration.minutes() < 10 ? `0${duration.minutes()}` : duration.minutes();
 
     return `${days}D ${hours}H ${minutes}M`;
   }

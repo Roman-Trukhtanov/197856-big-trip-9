@@ -8,6 +8,6 @@ export default class Tab extends AbstractComponent {
   }
 
   getTemplate() {
-    return `<a class="trip-tabs__btn ${this._isActive ? `trip-tabs__btn--active` : ``}" href="#">${this._title}</a>`.trim();
+    return `<a class="trip-tabs__btn ${this._isActive ? `trip-tabs__btn--active` : ``}" href="#" data-tab-type="${this._title.toLowerCase()}">${this._title}</a>`.trim();
   }
 }

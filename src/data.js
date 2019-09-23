@@ -1,4 +1,11 @@
-import {getRandomInt, reducer, getWayPointDescription} from "./utils";
+import {
+  getRandomInt,
+  reducer,
+  getWayPointDescription,
+  sortDataByTime,
+  getRandomBool
+} from "./utils";
+
 import moment from "moment";
 
 import {
@@ -62,6 +69,7 @@ const getWayPointData = () => ({
   description: getWayPointDescription(description),
   photos: getWayPointPhotos(),
   offers: getAdditionalOffers(),
+  isFavorite: getRandomBool(),
 
   get totalPrice() {
     let offerPrices = 0;
@@ -74,16 +82,21 @@ const getWayPointData = () => ({
   }
 });
 
-const sortedData = new Array(getRandomInt(0, 5))
-  .fill(``)
-  .map(() => getWayPointData())
-  .sort((left, right) => left.time.startTime - right.time.startTime);
+const getFullData = () => {
+  const generatedData = new Array(getRandomInt(0, 5))
+    .fill(``)
+    .map(() => getWayPointData());
 
-sortedData.forEach((itemData, index) => {
-  itemData.id = index;
-});
+  sortDataByTime(generatedData);
 
-export const wayPointsData = sortedData;
+  generatedData.forEach((itemData, index) => {
+    itemData.id = index;
+  });
+
+  return generatedData;
+};
+
+export const wayPointsData = getFullData();
 
 const getAllCities = (wayPoints) => wayPoints.map((wayPoint) => wayPoint.city);
 
@@ -92,12 +105,12 @@ const getTimes = (wayPoints) => ({
   endDate: wayPoints[wayPoints.length - 1].time.endTime,
 });
 
-export const infoData = {
-  cities: getAllCities(wayPointsData),
-  times: wayPointsData.length > 0 ? getTimes(wayPointsData) : null,
-};
+export const getInfoData = (data) => ({
+  cities: getAllCities(data),
+  times: data.length > 0 ? getTimes(data) : null,
+});
 
-export const menuData = [
+export const getMenuData = () => [
   {
     title: `Table`,
     isActive: true,
@@ -108,7 +121,7 @@ export const menuData = [
   },
 ];
 
-export const filtersData = [
+export const getFiltersData = () => [
   {
     title: `everything`,
     isChecked: true,
