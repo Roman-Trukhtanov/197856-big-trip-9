@@ -8,6 +8,8 @@ import {
 
 import moment from "moment";
 
+window.moment = moment;
+
 import {
   wayPointTypes,
   MIN_POINT_PRICE,

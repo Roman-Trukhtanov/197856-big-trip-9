@@ -1,4 +1,4 @@
-import {isLinkTag, Position, render, unrender} from "../utils";
+import {isInputTag, isLinkTag, Position, render, unrender} from "../utils";
 import Tabs from "../components/tabs";
 import Tab from "../components/tab";
 import TripInfo from "../components/trip-info";
@@ -19,7 +19,8 @@ export default class App {
       getInfoData,
       container,
       infoContainer,
-      controlsContainer
+      controlsContainer,
+      newPointBtn
   ) {
     this._data = pointsData;
     this._menuData = menuData;
@@ -37,7 +38,8 @@ export default class App {
     this._tripInfo = null;
     this._tripFilters = new TripFilters(this._filtersData);
     this._eventsMsg = new EventsMsg();
-    this._statistics = new Statistics();
+    this._statistics = new Statistics(this._data);
+    this._newPointBtn = newPointBtn;
     this._onMainDataChange = this._onMainDataChange.bind(this);
     this._isInitedTripController = false;
   }
@@ -51,7 +53,7 @@ export default class App {
     this._renderStatistics();
 
     this._addListenerToTabs();
-    this._addListenerToNewEvtBtn();
+    this._addListenerToNewPointBtn();
   }
 
   _onMainDataChange(newData) {
@@ -116,6 +118,19 @@ export default class App {
   _renderTripFilters() {
     const tripFiltersElements = this._tripFilters.getElement();
 
+    tripFiltersElements
+      .addEventListener(`change`, (evt) => {
+        evt.preventDefault();
+
+        if (!isInputTag(evt) || this._data.length === 0) {
+          evt.target.checked = false;
+          this._tripFilters.getElement().querySelector(`#filter-everything`).checked = true;
+          return;
+        }
+
+        this._tripController.filterPoints(evt.target.value);
+      });
+
     render(this._controlsContainer, tripFiltersElements, Position.BEFOREEND);
   }
 
@@ -141,6 +156,8 @@ export default class App {
       this._tripController.init();
       this._isInitedTripController = true;
     }
+
+    this._statistics.hide();
   }
 
   _renderStatistics() {
@@ -151,11 +168,15 @@ export default class App {
   _showEvents() {
     this._tripController.show();
     this._statistics.hide();
+    this._newPointBtn.disabled = false;
+    this._tripFilters.getElement().classList.remove(`visually-hidden`);
   }
 
   _showStatistics() {
     this._tripController.hide();
-    this._statistics.show();
+    this._statistics.show(this._data);
+    this._newPointBtn.disabled = true;
+    this._tripFilters.getElement().classList.add(`visually-hidden`);
   }
 
   _addListenerToTabs() {
@@ -164,7 +185,7 @@ export default class App {
     this._tabs.getElement().addEventListener(`click`, (evt) => {
       evt.preventDefault();
 
-      if (!isLinkTag(evt)) {
+      if (!isLinkTag(evt) || this._data.length === 0) {
         return;
       }
 
@@ -187,10 +208,8 @@ export default class App {
     });
   }
 
-  _addListenerToNewEvtBtn() {
-    const newEvtBtn = document.querySelector(`.trip-main__event-add-btn`);
-
-    newEvtBtn.addEventListener(`click`, (evt) => {
+  _addListenerToNewPointBtn() {
+    this._newPointBtn.addEventListener(`click`, (evt) => {
       evt.preventDefault();
 
       // При первом заходе в приложение и нет ни одного поинта
@@ -205,6 +224,8 @@ export default class App {
         this._mainContainer.innerHTML = ``;
         this._tripController.init();
       }
+
+      this._tripFilters.getElement().querySelector(`#filter-everything`).checked = true;
 
       this._tripController.onChangeView();
       this._tripController.createEvent();

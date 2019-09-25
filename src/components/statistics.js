@@ -1,8 +1,29 @@
 import AbstractComponent from "./abstract-component";
+import Chart from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import {reducer} from "../utils";
+import moment from "moment";
+
+const emoji = {
+  'taxi': `🚕`,
+  'bus': `🚌`,
+  'train': `🚂`,
+  'ship': `🚢`,
+  'transport': `🚆`,
+  'drive': `🚗`,
+  'flight': `✈️`,
+  'check-in': `🏨`,
+  'sightseeing': `🏛️`,
+  'restaurant': `🍴`,
+};
 
 export default class Statistics extends AbstractComponent {
-  constructor() {
+  constructor(data) {
     super();
+    this._data = data;
+    this._moneyChart = null;
+    this._transportChart = null;
+    this._timeStampChart = null;
   }
 
   getTemplate() {
@@ -25,9 +46,190 @@ export default class Statistics extends AbstractComponent {
 
   hide() {
     this.getElement().classList.add(`visually-hidden`);
+    this._destroy();
   }
 
-  show() {
+  show(data) {
+    this._data = data;
     this.getElement().classList.remove(`visually-hidden`);
+    this._init();
+  }
+
+  _getChart(ctx, {labels, data}, chartTitle, formitterCb) {
+    return new Chart(ctx, {
+      plugins: [ChartDataLabels],
+      type: `horizontalBar`,
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: `#ffffff`,
+          hoverBackgroundColor: `#e4e4e4`,
+        }]
+      },
+      options: {
+        plugins: {
+          datalabels: {
+            font: {
+              size: 15,
+              weight: `bold`,
+            },
+            anchor: `end`,
+            align: `left`,
+            clamp: true,
+            color: `#000000`,
+            formatter(value) {
+              return formitterCb(value);
+            }
+          }
+        },
+        aspectRatio: 4,
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              display: true,
+              fontSize: 13,
+              fontColor: `#000000`,
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false,
+            }
+          }],
+          xAxes: [{
+            ticks: {
+              beginAtZero: true,
+              display: false,
+            },
+            gridLines: {
+              display: false,
+              drawBorder: false
+            },
+          }]
+        },
+        tooltips: {
+          enabled: false,
+        },
+        title: {
+          display: true,
+          position: `left`,
+          padding: 30,
+          text: chartTitle,
+          fontSize: 28,
+          fontColor: `#000000`
+        },
+        legend: {
+          display: false,
+        }
+      }
+    });
+  }
+
+  _getFilteredMoneyData() {
+    const typeNames = new Set(this._data.map(({type}) => type.title));
+
+    const data = [...typeNames].map((typeName) => {
+      const filteredData = this._data.filter((pointData) => pointData.type.title === typeName);
+
+      return filteredData.map(({wayPointPrice}) => wayPointPrice).reduce(reducer);
+    });
+
+    const labelsWithEmoji = [...typeNames].map((typeName) => `${emoji[typeName]} ${typeName.toUpperCase()}`);
+
+    return {
+      labels: labelsWithEmoji,
+      data,
+    };
+  }
+
+  _getFilteredTransportData() {
+    const typeNames = new Set(this._data
+      .filter(({type}) => type.group === `transfer`)
+      .map(({type}) => type.title));
+
+    const data = [...typeNames].map((typeName) => {
+      const filteredData = this._data.filter((pointData) => pointData.type.title === typeName);
+
+      return filteredData.length;
+    });
+
+    const labelsWithEmoji = [...typeNames].map((typeName) => `${emoji[typeName]} ${typeName.toUpperCase()}`);
+
+    return {
+      labels: labelsWithEmoji,
+      data,
+    };
+  }
+
+  _getFilteredTimeData() {
+    const typeNames = new Set(this._data.map(({type}) => type.title));
+
+    const data = [...typeNames].map((typeName) => {
+      const filteredData = this._data.filter((pointData) => pointData.type.title === typeName);
+
+
+      return filteredData.map(({time}) => {
+        const amountOfHours = moment.duration(moment(time.endTime).diff(time.startTime)).asHours();
+
+        return Math.round(amountOfHours);
+      }).reduce(reducer);
+    });
+
+    const labelsWithEmoji = [...typeNames].map((typeName) => `${emoji[typeName]} ${typeName.toUpperCase()}`);
+
+    return {
+      labels: labelsWithEmoji,
+      data,
+    };
+  }
+
+  _renderMoneyChart() {
+    const moneyChartData = this._getFilteredMoneyData();
+
+    const chartMoneyCtx = this.getElement().querySelector(`.statistics__chart--money`);
+    const chartTitle = `MONEY`;
+    const formitter = (value) => value !== 0 ? `$ ${value}` : ``;
+
+    this._moneyChart = this._getChart(chartMoneyCtx, moneyChartData, chartTitle, formitter);
+  }
+
+  _renderTransportChart() {
+    const transportChartData = this._getFilteredTransportData();
+
+    const chartMoneyCtx = this.getElement().querySelector(`.statistics__chart--transport`);
+    const chartTitle = `TRANSPORT`;
+    const formitter = (value) => value !== 0 ? `${value}x` : ``;
+
+    this._transportChart = this._getChart(chartMoneyCtx, transportChartData, chartTitle, formitter);
+  }
+
+  _renderTimeSpentChart() {
+    const timeChartData = this._getFilteredTimeData();
+    const chartTimeCtx = this.getElement().querySelector(`.statistics__chart--time`);
+    const chartTitle = `TIME SPENT`;
+    const formitter = (value) => value !== 0 ? `${value}H` : ``;
+
+    this._transportChart = this._getChart(chartTimeCtx, timeChartData, chartTitle, formitter);
+  }
+
+  _init() {
+    this._renderMoneyChart();
+    this._renderTransportChart();
+    this._renderTimeSpentChart();
+  }
+
+  _destroy() {
+    if (this._moneyChart) {
+      this._moneyChart.destroy();
+    }
+
+    if (this._transportChart) {
+      this._transportChart.destroy();
+    }
+
+    if (this._timeStampChart) {
+      this._timeStampChart.destroy();
+    }
   }
 }
