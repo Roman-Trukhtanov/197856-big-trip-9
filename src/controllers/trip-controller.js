@@ -9,6 +9,18 @@ export const Mode = {
   DEFAULT: `default`,
 };
 
+export const FilterTypes = {
+  EVERYTHING: `everything`,
+  FUTURE: `future`,
+  PAST: `past`,
+};
+
+export const SortTypes = {
+  EVENT: `sort-event`,
+  TIME: `sort-time`,
+  PRICE: `sort-price`,
+};
+
 export default class TripController {
   constructor(
       container,
@@ -32,11 +44,12 @@ export default class TripController {
     this.onDataChange = this.onDataChange.bind(this);
     this._onMainDataChange = onMainDataChange;
     this._sortType = `sort-event`;
+    this._filterType = `everything`;
     this._creatingTask = null;
   }
   init() {
     this._renderSort();
-    this._renderDays();
+    this._renderDays(this._wayPointsData);
   }
 
   onChangeView() {
@@ -86,6 +99,10 @@ export default class TripController {
   createEvent() {
     if (this._creatingTask) {
       return;
+    }
+
+    if (this._filterType !== FilterTypes.EVERYTHING) {
+      this.filterPoints(FilterTypes.EVERYTHING);
     }
 
     const defaultEventData = {
@@ -172,10 +189,10 @@ export default class TripController {
     render(daysElement, dayElement, renderPosition);
   }
 
-  _renderDays() {
+  _renderDays(data) {
     const daysElement = this._days.getElement();
 
-    const daysData = this._getDays(this._wayPointsData);
+    const daysData = this._getDays(data);
 
     const daysKeys = Object.keys(daysData);
 
@@ -217,15 +234,44 @@ export default class TripController {
     sortingElement.addEventListener(`change`, (evt) => this._onSortItemClick(evt));
   }
 
+  filterPoints(filterType) {
+    this._creatingTask = null;
+
+    this._filterType = filterType;
+
+    this._flatPickrs.forEach((removeFlatPickrs) => removeFlatPickrs());
+    this._flatPickrs = [];
+
+    this._days.getElement().innerHTML = ``;
+
+    switch (filterType) {
+      case FilterTypes.EVERYTHING:
+        this._renderDays(this._wayPointsData);
+        break;
+      case FilterTypes.FUTURE:
+        const filteredByFuture = this._wayPointsData.slice().filter(({time}) => {
+          return time.startTime > Date.now();
+        });
+        this._renderDays(filteredByFuture);
+        break;
+      case FilterTypes.PAST:
+        const filteredByPast = this._wayPointsData.slice().filter(({time}) => {
+          return time.startTime < Date.now();
+        });
+        this._renderDays(filteredByPast);
+        break;
+    }
+  }
+
   _sortEvents() {
     this._flatPickrs.forEach((removeFlatPickrs) => removeFlatPickrs());
     this._flatPickrs = [];
 
     switch (this._sortType) {
-      case `sort-event`:
-        this._renderDays();
+      case SortTypes.EVENT:
+        this._renderDays(this._wayPointsData);
         break;
-      case `sort-time`:
+      case SortTypes.TIME:
         const sortedByTimeEventsData = this._wayPointsData.slice().sort((a, b) => {
           const durationLeft = Math.abs(a.time.endTime - a.time.startTime);
           const durationRight = Math.abs(b.time.endTime - b.time.startTime);
@@ -233,7 +279,7 @@ export default class TripController {
         });
         this._renderAllDaysList(sortedByTimeEventsData);
         break;
-      case `sort-price`:
+      case SortTypes.PRICE:
         const sortedByPriceEventsData = this._wayPointsData.slice().sort((a, b) => b.wayPointPrice - a.wayPointPrice);
 
         this._renderAllDaysList(sortedByPriceEventsData);

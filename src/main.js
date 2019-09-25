@@ -8,6 +8,8 @@ const tripInfoContainer = document.querySelector(`.trip-info`);
 
 const eventsContainer = document.querySelector(`.trip-events`);
 
+const newPointBtn = document.querySelector(`.trip-main__event-add-btn`);
+
 const app = new App(
     wayPointsData,
     getMenuData(),
@@ -18,7 +20,8 @@ const app = new App(
     getInfoData,
     eventsContainer,
     tripInfoContainer,
-    controlsContainer
+    controlsContainer,
+    newPointBtn
 );
 
 app.init();

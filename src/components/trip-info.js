@@ -11,7 +11,7 @@ export default class TripInfo extends AbstractComponent {
   getTemplate() {
     const tripInfoTitle = `${this._cities.length > 3 ? `${this._cities[0]} &mdash; ... &mdash; ${this._cities[this._cities.length - 1]}` : `${this._cities.join(` &mdash; `)}`}`;
 
-    const infoDate = `${moment(this._times.startDate).format(`MMM DD`)} &mdash; ${moment(this._times.endDate).format(`MMM DD`)}`;
+    const infoDate = `${moment(this._times.startDate).format(`MMM DD`)} &mdash; ${moment(this._times.endDate).format(`DD MMM`)}`;
 
     return `<div class="trip-info__main">
       <h1 class="trip-info__title">${tripInfoTitle}</h1>

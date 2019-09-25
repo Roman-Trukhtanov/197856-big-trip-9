@@ -66,6 +66,7 @@ export const isEscKey = (evt) => {
 };
 
 export const isLinkTag = (evt) => evt.target.tagName === `A`;
+export const isInputTag = (evt) => evt.target.tagName === `INPUT`;
 
 export const sortDataByTime = (dataArr) => {
   dataArr.sort((left, right) => left.time.startTime - right.time.startTime);
