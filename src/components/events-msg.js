@@ -1,11 +1,12 @@
 import AbstractComponent from "./abstract-component";
 
 export default class EventsMsg extends AbstractComponent {
-  constructor() {
+  constructor(message) {
     super();
+    this._message = message;
   }
 
   getTemplate() {
-    return `<p class="trip-events__msg">Click New Event to create your first point</p>`.trim();
+    return `<p class="trip-events__msg">${this._message ? this._message : ``}</p>`.trim();
   }
 }

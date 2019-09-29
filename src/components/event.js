@@ -3,11 +3,11 @@ import moment from "moment";
 import AbstractComponent from "./abstract-component";
 
 export default class Event extends AbstractComponent {
-  constructor({time, type, city, wayPointPrice, offers}) {
+  constructor({time, type, destination, wayPointPrice, offers}) {
     super();
     this._time = time;
     this._type = type;
-    this._city = city;
+    this._destination = destination;
     this._wayPointPrice = wayPointPrice;
     this._offers = offers;
     this._visibleOffersAmount = 1;
@@ -15,7 +15,7 @@ export default class Event extends AbstractComponent {
 
   _getOffersLayout() {
     return this._offers.map((offer) => {
-      if (offer.isSelected === false || this._visibleOffersAmount > MAX_VISIBLE_OFFERS_AMOUNT) {
+      if (offer.accepted === false || this._visibleOffersAmount > MAX_VISIBLE_OFFERS_AMOUNT) {
         return ``;
       }
 
@@ -52,7 +52,7 @@ export default class Event extends AbstractComponent {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${this._type.srcIconName}" alt="Event type icon - ${this._type.title}">
         </div>
-        <h3 class="event__title">${this._type.prefixTemplate} ${this._city}</h3>
+        <h3 class="event__title">${this._type.prefixTemplate} ${this._destination.name}</h3>
   
         <div class="event__schedule">
           <p class="event__time">

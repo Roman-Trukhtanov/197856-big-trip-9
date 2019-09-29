@@ -930,3 +930,36 @@ main {
 
 .statistics__item:not(:last-child) {
   margin-bottom: 78px; }
+
+.shake {
+  animation: shake 0.6s linear;
+}
+
+@-webkit-keyframes shake {
+  0%, 100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-7px);
+    transform: translateX(-7px);
+  }
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(7px);
+    transform: translateX(7px);
+  }
+}
+@keyframes shake {
+  0%, 100% {
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    -webkit-transform: translateX(-7px);
+    transform: translateX(-7px);
+  }
+  20%, 40%, 60%, 80% {
+    -webkit-transform: translateX(7px);
+    transform: translateX(7px);
+  }
+}

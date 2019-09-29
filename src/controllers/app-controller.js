@@ -7,13 +7,16 @@ import TripFilters from "../components/trip-filters";
 import EventsMsg from "../components/events-msg";
 import TripController from "./trip-controller";
 import Statistics from "../components/statistics";
+import {Message} from "../config";
 
 export default class App {
   constructor(
+      api,
       pointsData,
+      destinations,
+      offersByTypes,
       menuData,
       filtersData,
-      cities,
       monthsNames,
       wayPointTypes,
       getInfoData,
@@ -22,10 +25,12 @@ export default class App {
       controlsContainer,
       newPointBtn
   ) {
+    this._api = api;
     this._data = pointsData;
+    this._destinations = destinations;
+    this._offersByTypes = offersByTypes;
     this._menuData = menuData;
     this._filtersData = filtersData;
-    this._cities = cities;
     this._monthsNames = monthsNames;
     this._wayPointTypes = wayPointTypes;
     this._mainContainer = container;
@@ -37,11 +42,12 @@ export default class App {
     this._tripCost = null;
     this._tripInfo = null;
     this._tripFilters = new TripFilters(this._filtersData);
-    this._eventsMsg = new EventsMsg();
+    this._eventsMsg = new EventsMsg(Message.FIRST_POINT);
     this._statistics = new Statistics(this._data);
     this._newPointBtn = newPointBtn;
     this._onMainDataChange = this._onMainDataChange.bind(this);
     this._isInitedTripController = false;
+    this._currentTab = null;
   }
 
   init() {
@@ -142,10 +148,12 @@ export default class App {
 
   _renderTripMain() {
     this._tripController = new TripController(
+        this._api,
         this._mainContainer,
         this._data,
+        this._destinations,
+        this._offersByTypes,
         this._wayPointTypes,
-        this._cities,
         this._monthsNames,
         this._onMainDataChange
     );
@@ -197,13 +205,19 @@ export default class App {
 
       evt.target.classList.add(`trip-tabs__btn--active`);
 
-      switch (tabType) {
-        case `table`:
-          this._showEvents();
-          break;
-        case `stats`:
-          this._showStatistics();
-          break;
+      if (tabType === this._currentTab) {
+        return;
+      } else {
+        this._currentTab = tabType;
+
+        switch (tabType) {
+          case `table`:
+            this._showEvents();
+            break;
+          case `stats`:
+            this._showStatistics();
+            break;
+        }
       }
     });
   }

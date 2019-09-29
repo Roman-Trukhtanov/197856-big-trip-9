@@ -1,23 +1,3 @@
-import {getRandomBool} from "./utils";
-
-export const TIME_CONFIG = {
-  MS_IN_SECOND: 1000,
-  SECONDS_IN_MINUTE: 60,
-  MINUTES_IN_HOUR: 60,
-  HOURS_IN_DAY: 24,
-  DAYS_IN_WEEK: 7,
-};
-
-export const MAX_PHOTOS_AMOUNT = 6;
-
-export const MIN_SENTENCE_AMOUNT = 0;
-
-export const MAX_SENTENCE_AMOUNT = 3;
-
-export const MIN_POINT_PRICE = 20;
-
-export const MAX_POINT_PRICE = 500;
-
 export const MAX_VISIBLE_OFFERS_AMOUNT = 3;
 
 export const wayPointTypes = {
@@ -83,53 +63,6 @@ export const wayPointTypes = {
   },
 };
 
-export const cities = [
-  `Venice`,
-  `Budapest`,
-  `Paris`,
-  `Brugge`,
-  `Amsterdam`,
-  `Athens`,
-  `Saint Petersburg`,
-  `Moscow`,
-  `Sydney`
-];
-
-export const description = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus`;
-
-export const getAdditionalOffers = () => [
-  {
-    title: `Add luggage`,
-    name: `luggage`,
-    price: 30,
-    isSelected: getRandomBool(),
-  },
-  {
-    title: `Switch to comfort class`,
-    name: `comfort`,
-    price: 100,
-    isSelected: getRandomBool(),
-  },
-  {
-    title: `Add meal`,
-    name: `meal`,
-    price: 15,
-    isSelected: getRandomBool(),
-  },
-  {
-    title: `Choose seats`,
-    name: `seats`,
-    price: 5,
-    isSelected: getRandomBool(),
-  },
-  {
-    title: `Travel by train`,
-    name: `travel`,
-    price: 40,
-    isSelected: getRandomBool(),
-  }
-];
-
 export const monthsNames = [
   `jan`,
   `feb`,
@@ -144,3 +77,9 @@ export const monthsNames = [
   `nov`,
   `dec`,
 ];
+
+export const Message = {
+  FIRST_POINT: `Click New Event to create your first point`,
+  LOADING: `Loading...`,
+  ERROR: `ERROR!!!`,
+};
