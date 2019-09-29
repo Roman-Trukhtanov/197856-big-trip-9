@@ -47,7 +47,7 @@ export const sortDataByTime = (dataArr) => {
   dataArr.sort((left, right) => left.time.startTime - right.time.startTime);
 };
 
-export const debounce = (callback, wait = 300) => {
+export const debounce = (callback, wait = 200) => {
   let timeOut = null;
   return (...args) => {
     const next = () => callback(...args);
