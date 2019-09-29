@@ -51,6 +51,7 @@ export default class PointController {
     this._mode = mode;
     this._saveBtn = this._eventEdit.getElement().querySelector(`.event__save-btn`);
     this._deleteBtn = this._eventEdit.getElement().querySelector(`.event__reset-btn`);
+    this._eventEditForm = this._eventEdit.getElement().querySelector(`.event--edit`);
     this.init();
   }
 
@@ -101,6 +102,14 @@ export default class PointController {
     }, ANIMATION_TIMEOUT);
   }
 
+  _setErrorBorder(element) {
+    element.style.border = `3px solid #ff7272`;
+  }
+
+  _removeErrorBorder(element) {
+    element.style.border = ``;
+  }
+
   _blockButtons() {
     this._saveBtn.disabled = true;
     this._deleteBtn.disabled = true;
@@ -122,6 +131,7 @@ export default class PointController {
       .catch(() => {
         favoriteInput.checked = !this._eventData.isFavorite;
         this._eventData.isFavorite = !this._eventData.isFavorite;
+        this._setErrorBorder(this._eventEditForm);
         this._shake(this._eventEdit.getElement());
         this._unblockButtons();
       });
@@ -131,6 +141,8 @@ export default class PointController {
     evt.preventDefault();
     const favoriteInput = evt.target;
     this._blockButtons();
+    this._removeErrorBorder(this._eventEditForm);
+    this._removeErrorBorder(this._eventEdit.getElement());
 
     this._updateFavoriteStatus(favoriteInput);
   }
@@ -196,6 +208,7 @@ export default class PointController {
       .addEventListener(`submit`, (evt) => {
         evt.preventDefault();
 
+        this._removeErrorBorder(this._eventEditForm);
         this._blockButtons();
 
         const saveBtn = eventEditElement.querySelector(`.event__save-btn`);
@@ -211,6 +224,7 @@ export default class PointController {
             .catch(() => {
               saveBtn.textContent = ButtonState.SAVE;
               this._unblockButtons();
+              this._setErrorBorder(this._eventEditForm);
               this._shake(this._eventEdit.getElement());
             });
         } else {
@@ -221,6 +235,7 @@ export default class PointController {
             .catch(() => {
               saveBtn.textContent = ButtonState.SAVE;
               this._unblockButtons();
+              this._setErrorBorder(this._eventEditForm);
               this._shake(this._eventEdit.getElement());
             });
         }
@@ -232,6 +247,7 @@ export default class PointController {
       .querySelector(`.event__reset-btn`)
       .addEventListener(`click`, (evt) => {
         evt.preventDefault();
+        this._removeErrorBorder(this._eventEditForm);
 
         this._blockButtons();
 
@@ -248,6 +264,7 @@ export default class PointController {
             .catch(() => {
               deleteBtn.textContent = ButtonState.DELETE;
               this._unblockButtons();
+              this._setErrorBorder(this._eventEditForm);
               this._shake(this._eventEdit.getElement());
             });
         }

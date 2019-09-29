@@ -5,7 +5,7 @@ import EventsMsg from "./components/events-msg";
 import API from "./api";
 import App from "./controllers/app-controller";
 
-const AUTHORIZATION = `Basic RT_Space_Web_Dev_01`;
+const AUTHORIZATION = `Basic RT_Space_Web_Dev_98`;
 const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip/`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
@@ -63,6 +63,7 @@ Promise.all([
   .then(() => {
     unRenderLoadingMessage(eventMessage.getElement());
     eventMessage.removeElement();
+    newPointBtn.disabled = false;
     initApp(serverData);
   })
   .catch(() => (eventMessage.getElement().textContent = Message.ERROR));
