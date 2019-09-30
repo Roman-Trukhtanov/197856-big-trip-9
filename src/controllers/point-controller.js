@@ -16,7 +16,7 @@ const ButtonState = {
 
 export default class PointController {
   constructor(
-      api,
+      provider,
       data,
       wayPointTypes,
       destinations,
@@ -27,16 +27,17 @@ export default class PointController {
       onChangeView,
       mode
   ) {
-    this._api = api;
+    this._provider = provider;
     this._eventData = data;
     this._container = container;
     this._wayPointsTypes = wayPointTypes;
     this._offersByTypes = offersByTypes;
     this._destinations = destinations;
+    this._pointsLength = pointsLength;
     this._event = new Event(data);
     this._eventEdit = new EventEdit(
         this._eventData,
-        pointsLength,
+        this._pointsLength,
         this._wayPointsTypes,
         this._offersByTypes,
         this._destinations,
@@ -123,7 +124,7 @@ export default class PointController {
   _updateFavoriteStatus(favoriteInput) {
     this._eventData.isFavorite = !this._eventData.isFavorite;
 
-    this._api.updatePoint(this._eventData.toRAW())
+    this._provider.updatePoint(this._eventData.toRAW())
       .then(() => {
         favoriteInput.checked = this._eventData.isFavorite;
         this._unblockButtons();
@@ -217,7 +218,7 @@ export default class PointController {
         const newData = this._getNewData();
 
         if (this._mode === Mode.ADDING) {
-          this._api.createPoint(newData.toRAW())
+          this._provider.createPoint({point: newData.toRAW(), id: this._pointsLength})
             .then((serverData) => {
               this._onDataChange(serverData, null);
             })
@@ -228,7 +229,7 @@ export default class PointController {
               this._shake(this._eventEdit.getElement());
             });
         } else {
-          this._api.updatePoint(newData.toRAW())
+          this._provider.updatePoint(newData.toRAW())
             .then((serverData) => {
               this._onDataChange(serverData, this._eventData);
             })
@@ -257,7 +258,7 @@ export default class PointController {
         if (this._mode === Mode.ADDING) {
           this._onDataChange(null, this._mode === Mode.DEFAULT ? this._eventData : null);
         } else {
-          this._api.deletePoint(this._eventData.toRAW())
+          this._provider.deletePoint(this._eventData.toRAW())
             .then(() => {
               this._onDataChange(null, this._mode === Mode.DEFAULT ? this._eventData : null);
             })

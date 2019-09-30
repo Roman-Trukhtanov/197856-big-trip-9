@@ -83,9 +83,10 @@ export default class Statistics extends AbstractComponent {
             }
           }
         },
-        aspectRatio: 4,
+        aspectRatio: 3.25,
         scales: {
           yAxes: [{
+            barThickness: 25,
             ticks: {
               beginAtZero: true,
               display: true,
