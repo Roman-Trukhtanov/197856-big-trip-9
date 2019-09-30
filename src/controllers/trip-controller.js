@@ -4,6 +4,7 @@ import Day from "../components/day";
 import Sort from "../components/sort";
 import PointController from "./point-controller";
 import ModelPoint from "../model-point";
+import moment from "moment";
 
 export const Mode = {
   ADDING: `adding`,
@@ -26,7 +27,7 @@ const DEFAULT_OFFER_TYPE = `taxi`;
 
 export default class TripController {
   constructor(
-      api,
+      provider,
       container,
       wayPointsData,
       destinations,
@@ -35,7 +36,7 @@ export default class TripController {
       monthsNames,
       onMainDataChange
   ) {
-    this._api = api;
+    this._provider = provider;
     this._container = container;
     this._wayPointsData = wayPointsData;
     this._wayPointsTypes = wayPointTypes;
@@ -140,7 +141,7 @@ export default class TripController {
 
   _renderEvent(data, container, mode) {
     const pointController = new PointController(
-        this._api,
+        this._provider,
         data,
         this._wayPointsTypes,
         this._destinations,
@@ -161,7 +162,7 @@ export default class TripController {
     let targetDayNumber = 1;
 
     for (const dataItem of data) {
-      const dayKey = `${this._monthsNames[new Date(dataItem.time.startTime).getMonth()]}_${new Date(dataItem.time.startTime).getDate()}`;
+      const dayKey = moment(dataItem.time.startTime).format(`DD_MM_YYYY`);
 
       if (days.hasOwnProperty(dayKey)) {
         days[dayKey].events.push(dataItem);

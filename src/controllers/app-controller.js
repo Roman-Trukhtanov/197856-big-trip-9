@@ -11,7 +11,7 @@ import {Message} from "../config";
 
 export default class App {
   constructor(
-      api,
+      provider,
       pointsData,
       destinations,
       offersByTypes,
@@ -25,7 +25,7 @@ export default class App {
       controlsContainer,
       newPointBtn
   ) {
-    this._api = api;
+    this._provider = provider;
     this._data = pointsData;
     this._destinations = destinations;
     this._offersByTypes = offersByTypes;
@@ -148,7 +148,7 @@ export default class App {
 
   _renderTripMain() {
     this._tripController = new TripController(
-        this._api,
+        this._provider,
         this._mainContainer,
         this._data,
         this._destinations,

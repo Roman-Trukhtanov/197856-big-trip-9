@@ -83,3 +83,9 @@ export const Message = {
   LOADING: `Loading...`,
   ERROR: `ERROR!!!`,
 };
+
+export const DataGroup = {
+  POINTS: `points`,
+  DESTINATIONS: `destinations`,
+  OFFERS_BY_TYPES: `offersByTypes`,
+};
