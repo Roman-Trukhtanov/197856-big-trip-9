@@ -10,6 +10,7 @@ import App from "./controllers/app-controller";
 const AUTHORIZATION = `Basic RT_Space_Web_Dev_03`;
 const END_POINT = `https://htmlacademy-es-9.appspot.com/big-trip/`;
 const APP_STORE_KEY = `app-store-key`;
+
 const checkOnlineStatus = () => {
   return window.navigator.onLine;
 };
@@ -18,14 +19,26 @@ const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 const store = new Store({key: APP_STORE_KEY, storage: localStorage});
 const provider = new Provider({api, store, isOnline: checkOnlineStatus});
 
-window.addEventListener(`offline`, () => {
-  document.title = `${document.title} - [OFFLINE]`;
-});
-
-window.addEventListener(`online`, () => {
+const onWindowOnline = () => {
   document.title = document.title.split(` - [OFFLINE]`)[0];
   provider.syncPoints();
+};
+
+const onWindowOffline = () => {
+  document.title = `${document.title} - [OFFLINE]`;
+};
+
+window.addEventListener(`online`, () => {
+  onWindowOnline();
 });
+
+window.addEventListener(`offline`, () => {
+  onWindowOffline();
+});
+
+if (checkOnlineStatus() === false) {
+  onWindowOffline();
+}
 
 const controlsContainer = document.querySelector(`.trip-controls`);
 
